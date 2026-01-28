@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+    sassOptions: {
+        silenceDeprecations: ['import']
+    }
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

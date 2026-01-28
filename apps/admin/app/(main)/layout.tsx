@@ -9,7 +9,6 @@ export const metadata: Metadata = {
     title: 'Aloha',
     description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.',
     robots: { index: false, follow: false },
-    viewport: { initialScale: 1, width: 'device-width' },
     openGraph: {
         type: 'website',
         title: 'Aloha',
@@ -21,6 +20,11 @@ export const metadata: Metadata = {
     icons: {
         icon: '/favicon.ico'
     }
+};
+
+export const viewport = {
+    initialScale: 1,
+    width: 'device-width'
 };
 
 export default function AppLayout({ children }: AppLayoutProps) {
