@@ -13,7 +13,10 @@
         "lint": "pnpm --filter admin lint",
         "format": "pnpm --filter admin format",
         "type-check": "pnpm --filter admin exec tsc --noEmit",
-        "test:ci": "pnpm lint && pnpm type-check && pnpm build && pnpm audit --audit-level moderate",
+        "test": "pnpm --filter admin test",
+        "test:watch": "pnpm --filter admin test:watch",
+        "test:coverage": "pnpm --filter admin test:coverage",
+        "test:ci": "pnpm lint && pnpm type-check && pnpm test && pnpm build && pnpm audit --audit-level moderate",
         "prepare": "husky"
     },
     "devDependencies": {

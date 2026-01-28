@@ -27,15 +27,35 @@ pnpm dev
 pnpm build
 ```
 
-## 📋 Available Scripts
+## 🧪 Testing
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint
-- `pnpm format` - Format code with Prettier
-- `pnpm type-check` - Run TypeScript type checking
-- `pnpm test:ci` - Run full CI pipeline locally (lint + type-check + build + security audit)
+This project includes comprehensive testing setup:
+
+### Unit Tests
+
+```bash
+pnpm test          # Run all tests
+pnpm test:watch    # Run tests in watch mode
+pnpm test:coverage # Run tests with coverage report
+```
+
+### Test Types Included:
+
+- **Service Tests**: ProductService với dump data validation
+- **Component Tests**: ProductCard với props và rendering
+- **Integration Tests**: Dashboard với mocked services
+
+### Test Coverage:
+
+- ✅ Service layer (ProductService)
+- ✅ Component rendering (ProductCard)
+- ✅ Async operations (API calls)
+- ✅ Mocking external dependencies
+- ✅ TypeScript integration
+
+### CI Integration:
+
+Tests run automatically on every PR/push via GitHub Actions.
 
 ## 🔄 CI/CD
 

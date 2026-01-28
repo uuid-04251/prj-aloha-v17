@@ -13,7 +13,17 @@ export default [
             globals: {
                 ...globals.browser,
                 ...globals.node,
-                React: 'readonly'
+                React: 'readonly',
+                // Jest globals
+                describe: 'readonly',
+                it: 'readonly',
+                test: 'readonly',
+                expect: 'readonly',
+                beforeEach: 'readonly',
+                afterEach: 'readonly',
+                beforeAll: 'readonly',
+                afterAll: 'readonly',
+                jest: 'readonly'
             },
             parser: tsParser,
             ecmaVersion: 'latest',
@@ -30,7 +40,8 @@ export default [
             ...react.configs.recommended.rules,
             ...react.configs['jsx-runtime'].rules,
             'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-            '@next/next/no-html-link-for-pages': 'off'
+            '@next/next/no-html-link-for-pages': 'off',
+            '@next/next/no-img-element': 'off' // Allow img tags in test files
         }
     }
 ];

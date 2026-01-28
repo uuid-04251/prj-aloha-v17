@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+ 
 'use client';
 import { ChartData } from 'chart.js';
 import { Button } from 'primereact/button';

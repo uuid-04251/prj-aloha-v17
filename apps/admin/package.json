@@ -7,7 +7,10 @@
         "build": "next build",
         "start": "next start",
         "format": "prettier --write \"{app,demo,layout,types}/**/*.{js,ts,tsx,d.ts}\"",
-        "lint": "cd ../.. && eslint apps/admin --ext .ts,.tsx,.js,.jsx --ignore-pattern 'apps/admin/.next/**' --ignore-pattern 'node_modules/**'"
+        "lint": "cd ../.. && eslint apps/admin --ext .ts,.tsx,.js,.jsx --ignore-pattern 'apps/admin/.next/**' --ignore-pattern 'node_modules/**'",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage"
     },
     "dependencies": {
         "@types/node": "20.3.1",
@@ -24,7 +27,14 @@
         "typescript": "5.1.3"
     },
     "devDependencies": {
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "@testing-library/user-event": "^14.6.1",
+        "@types/jest": "^30.0.0",
         "@types/react-transition-group": "^4.4.12",
-        "sass": "^1.63.4"
+        "jest": "^30.2.0",
+        "jest-environment-jsdom": "^30.2.0",
+        "sass": "^1.63.4",
+        "ts-jest": "^29.4.6"
     }
 }
