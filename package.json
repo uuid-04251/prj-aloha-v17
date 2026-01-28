@@ -1,20 +1,22 @@
 {
-    "name": "aloha-monorepo",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": [
-        "apps/*"
-    ],
-    "scripts": {
-        "dev": "pnpm --filter admin dev",
-        "build": "pnpm --filter admin build",
-        "start": "pnpm --filter admin start",
-        "lint": "pnpm --filter admin lint",
-        "format": "pnpm --filter admin format"
-    },
-    "devDependencies": {
-        "eslint": "^8.0.0",
-        "eslint-config-next": "13.4.6",
-        "prettier": "^3.0.0"
-    }
+  "name": "aloha-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter admin dev",
+    "build": "pnpm --filter admin build",
+    "start": "pnpm --filter admin start",
+    "lint": "pnpm --filter admin lint",
+    "format": "pnpm --filter admin format",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "eslint-config-next": "13.4.6",
+    "husky": "^9.1.7",
+    "prettier": "^3.0.0"
+  }
 }
