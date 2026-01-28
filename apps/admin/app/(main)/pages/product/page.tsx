@@ -15,7 +15,7 @@ import { Skeleton } from 'primereact/skeleton';
 import { Rating } from 'primereact/rating';
 import { Tag } from 'primereact/tag';
 import { Image } from 'primereact/image';
-import { ProductService, Product } from '../../../../demo/service/ProductService';
+import { ProductService, Product } from '../../../../services/ProductService';
 
 const ProductPage = () => {
     let emptyProduct: Product = {

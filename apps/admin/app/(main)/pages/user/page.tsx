@@ -11,7 +11,7 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { classNames } from 'primereact/utils';
 import { Skeleton } from 'primereact/skeleton';
-import { UserService, User } from '../../../../demo/service/UserService';
+import { UserService, User } from '../../../../services/UserService';
 
 const UserPage = () => {
     let emptyUser: User = {

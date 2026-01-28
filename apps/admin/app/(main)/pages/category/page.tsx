@@ -11,7 +11,7 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { classNames } from 'primereact/utils';
 import { Skeleton } from 'primereact/skeleton';
-import { CategoryService, Category } from '../../../../demo/service/CategoryService';
+import { CategoryService, Category } from '../../../../services/CategoryService';
 
 const CategoryPage = () => {
     let emptyCategory: Category = {
