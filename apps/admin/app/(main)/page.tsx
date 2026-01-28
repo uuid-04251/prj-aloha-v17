@@ -1,4 +1,3 @@
- 
 'use client';
 import { ChartData } from 'chart.js';
 import { Button } from 'primereact/button';
