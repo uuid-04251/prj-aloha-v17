@@ -29,7 +29,8 @@ export default [
         rules: {
             ...react.configs.recommended.rules,
             ...react.configs['jsx-runtime'].rules,
-            'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }]
+            'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+            '@next/next/no-html-link-for-pages': 'off'
         }
     }
 ];
