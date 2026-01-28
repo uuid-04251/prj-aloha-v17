@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
+        "build": "next build --webpack",
         "start": "next start",
         "format": "prettier --write \"{app,demo,layout,types}/**/*.{js,ts,tsx,d.ts}\"",
         "lint": "cd ../.. && eslint apps/admin --ext .ts,.tsx,.js,.jsx --ignore-pattern 'apps/admin/.next/**' --ignore-pattern 'node_modules/**'",
@@ -27,6 +27,7 @@
         "typescript": "5.1.3"
     },
     "devDependencies": {
+        "@next/bundle-analyzer": "^16.1.6",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
         "@testing-library/user-event": "^14.6.1",

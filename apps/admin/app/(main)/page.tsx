@@ -1,14 +1,18 @@
 'use client';
 import { ChartData } from 'chart.js';
-import { Button } from 'primereact/button';
-import { Chart } from 'primereact/chart';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
 import { Menu } from 'primereact/menu';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { LayoutContext } from '../../layout/context/layoutcontext';
 import { ProductService } from '../../services/ProductService';
 import type { Product } from '../../services/ProductService';
+
+// Dynamic imports for PrimeReact components
+const Button = dynamic(() => import('primereact/button').then(mod => ({ default: mod.Button })));
+const Chart = dynamic(() => import('primereact/chart').then(mod => ({ default: mod.Chart })));
+const Column = dynamic(() => import('primereact/column').then(mod => ({ default: mod.Column })));
+const DataTable = dynamic(() => import('primereact/datatable').then(mod => ({ default: mod.DataTable })));
+
+import dynamic from 'next/dynamic';
 
 const lineData: ChartData = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],

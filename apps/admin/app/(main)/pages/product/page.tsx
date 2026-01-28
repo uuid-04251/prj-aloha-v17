@@ -1,21 +1,25 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { InputNumber } from 'primereact/inputnumber';
-import { Dropdown } from 'primereact/dropdown';
-import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { classNames } from 'primereact/utils';
-import { Skeleton } from 'primereact/skeleton';
-import { Rating } from 'primereact/rating';
-import { Tag } from 'primereact/tag';
-import { Image } from 'primereact/image';
 import { ProductService, Product } from '../../../../services/ProductService';
+import { confirmDialog } from 'primereact/confirmdialog';
+import { Toast } from 'primereact/toast';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports for PrimeReact components
+const DataTable = dynamic(() => import('primereact/datatable').then(mod => ({ default: mod.DataTable })));
+const Column = dynamic(() => import('primereact/column').then(mod => ({ default: mod.Column })));
+const Button = dynamic(() => import('primereact/button').then(mod => ({ default: mod.Button })));
+const Dialog = dynamic(() => import('primereact/dialog').then(mod => ({ default: mod.Dialog })));
+const InputText = dynamic(() => import('primereact/inputtext').then(mod => ({ default: mod.InputText })));
+const InputTextarea = dynamic(() => import('primereact/inputtextarea').then(mod => ({ default: mod.InputTextarea })));
+const InputNumber = dynamic(() => import('primereact/inputnumber').then(mod => ({ default: mod.InputNumber })));
+const Dropdown = dynamic(() => import('primereact/dropdown').then(mod => ({ default: mod.Dropdown })));
+const ConfirmDialog = dynamic(() => import('primereact/confirmdialog').then(mod => ({ default: mod.ConfirmDialog })));
+const Skeleton = dynamic(() => import('primereact/skeleton').then(mod => ({ default: mod.Skeleton })));
+const Rating = dynamic(() => import('primereact/rating').then(mod => ({ default: mod.Rating })));
+const Tag = dynamic(() => import('primereact/tag').then(mod => ({ default: mod.Tag })));
+const Image = dynamic(() => import('primereact/image').then(mod => ({ default: mod.Image })));
 
 const ProductPage = () => {
     let emptyProduct: Product = {
