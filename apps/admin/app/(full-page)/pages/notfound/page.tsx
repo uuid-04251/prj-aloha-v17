@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const NotFoundPage = () => {
     return (
         <div className="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
             <div className="flex flex-column align-items-center justify-content-center">
-                <img src="/layout/images/logo-dark.svg" alt="Aloha logo" className="mb-5 w-6rem flex-shrink-0" />
+                <Image src="/layout/images/logo-dark.svg" alt="Aloha logo" width={96} height={96} className="mb-5 w-6rem flex-shrink-0" />
                 <div
                     style={{
                         borderRadius: '56px',
