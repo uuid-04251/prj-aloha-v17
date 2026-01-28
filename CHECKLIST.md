@@ -47,6 +47,7 @@ Dưới đây là checklist tối ưu repo cần thực hiện ngay cho monorepo
 - [x] Setup GitHub Actions để auto-run lint, type-check, build trên PR/push.
 - [x] Tạo `.github/workflows/ci.yml` với steps: checkout, pnpm install, lint, type-check, build.
 - [x] Thêm security audit vào CI workflow.
+- [x] Fix CI error: add pnpm setup step trước Node.js setup.
 - [x] Lý do: Catch errors early, ensure quality.
 
 ## 4. Add Unit Tests (Medium Priority)
