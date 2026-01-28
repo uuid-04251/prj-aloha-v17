@@ -7,14 +7,14 @@
         "build": "next build",
         "start": "next start",
         "format": "prettier --write \"{app,demo,layout,types}/**/*.{js,ts,tsx,d.ts}\"",
-        "lint": "next lint"
+        "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
     },
     "dependencies": {
         "@types/node": "20.3.1",
         "@types/react": "18.2.12",
         "@types/react-dom": "18.2.5",
         "chart.js": "4.2.1",
-        "next": "13.4.8",
+        "next": "16.1.6",
         "primeflex": "^3.3.1",
         "primeicons": "^6.0.1",
         "primereact": "10.2.1",

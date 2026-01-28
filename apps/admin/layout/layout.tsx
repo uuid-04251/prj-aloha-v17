@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEventListener, useMountEffect, useUnmountEffect } from 'primereact/hooks';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, Suspense } from 'react';
 import { classNames } from 'primereact/utils';
 import AppFooter from './AppFooter';
 import AppSidebar from './AppSidebar';
@@ -13,6 +13,32 @@ import { LayoutContext } from './context/layoutcontext';
 import { PrimeReactContext } from 'primereact/api';
 import { ChildContainerProps, LayoutState, AppTopbarRef } from '@/types';
 import { usePathname, useSearchParams } from 'next/navigation';
+
+const SearchParamsHandler = () => {
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const { layoutState, setLayoutState } = useContext(LayoutContext);
+
+    useEffect(() => {
+        if (layoutState.staticMenuMobileActive) {
+            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, staticMenuMobileActive: false }));
+        }
+        if (layoutState.overlayMenuActive) {
+            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, overlayMenuActive: false }));
+        }
+        if (layoutState.staticMenuDesktopInactive) {
+            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, staticMenuDesktopInactive: false }));
+        }
+        if (layoutState.profileSidebarVisible) {
+            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, profileSidebarVisible: false }));
+        }
+        if (layoutState.configSidebarVisible) {
+            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, configSidebarVisible: false }));
+        }
+    }, [pathname, searchParams]);
+
+    return null;
+};
 
 const Layout = ({ children }: ChildContainerProps) => {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
@@ -36,11 +62,10 @@ const Layout = ({ children }: ChildContainerProps) => {
     });
 
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     useEffect(() => {
         hideMenu();
         hideProfileMenu();
-    }, [pathname, searchParams]);
+    }, [pathname]);
 
     const [bindProfileMenuOutsideClickListener, unbindProfileMenuOutsideClickListener] = useEventListener({
         type: 'click',
@@ -124,10 +149,15 @@ const Layout = ({ children }: ChildContainerProps) => {
 
     return (
         <React.Fragment>
+            <Suspense fallback={null}>
+                <SearchParamsHandler />
+            </Suspense>
             <div className={containerClass}>
                 <AppTopbar ref={topbarRef} />
                 <div ref={sidebarRef} className="layout-sidebar">
-                    <AppSidebar />
+                    <Suspense fallback={null}>
+                        <AppSidebar />
+                    </Suspense>
                 </div>
                 <div className="layout-main-container">
                     <div className="layout-main">{children}</div>
