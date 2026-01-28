@@ -61,6 +61,7 @@ Dưới đây là checklist tối ưu repo cần thực hiện ngay cho monorepo
 - [x] Thêm Jest globals vào ESLint config.
 - [x] Cập nhật CI workflow để chạy tests.
 - [x] Fix TypeScript errors trong test files (useState types, mock data).
+- [x] Fix CI Jest config: explicitly specify jest.config.js to avoid ts-node dependency.
 - [x] Lý do: Đảm bảo code reliability, integrate với CI.
 
 ## 5. Bundle Optimization (Medium Priority)
