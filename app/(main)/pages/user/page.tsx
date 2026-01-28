@@ -11,7 +11,7 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { classNames } from 'primereact/utils';
 import { Skeleton } from 'primereact/skeleton';
-import { UserService, User } from '/Users/MAC/Desktop/lamdd/aloha/prj-aloha-v15/demo/service/UserService';
+import { UserService, User } from '/Users/MAC/Desktop/lamdd/aloha/prj-aloha-v17/demo/service/UserService';
 
 const UserPage = () => {
     let emptyUser: User = {
