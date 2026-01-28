@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
-import { Demo } from '@/types';
 import { ChartData } from 'chart.js';
 import { Button } from 'primereact/button';
 import { Chart } from 'primereact/chart';
@@ -10,6 +9,7 @@ import { Menu } from 'primereact/menu';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { LayoutContext } from '../../layout/context/layoutcontext';
 import { ProductService } from '../../services/ProductService';
+import type { Product } from '../../services/ProductService';
 
 const lineData: ChartData = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -34,7 +34,7 @@ const lineData: ChartData = {
 };
 
 const Dashboard = () => {
-    const [products, setProducts] = useState<Demo.Product[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const menu1 = useRef<Menu>(null);
     const menu2 = useRef<Menu>(null);
     const { layoutConfig } = useContext(LayoutContext);
@@ -100,7 +100,7 @@ const Dashboard = () => {
     }, [layoutConfig.colorScheme]);
 
     useEffect(() => {
-        ProductService.getProducts().then((data) => setProducts(data));
+        ProductService.getProducts().then((data: Product[]) => setProducts(data));
     }, []);
 
     const formatCurrency = (value: number) => {
@@ -177,7 +177,7 @@ const Dashboard = () => {
                 <div className="card">
                     <h5>Recent Sales</h5>
                     <DataTable value={products} rows={5} paginator responsiveLayout="scroll">
-                        <Column header="Image" body={(data) => <img className="shadow-2" src={`/demo/images/product/${data.image}`} alt={data.image} width="50" />} />
+                        <Column header="Image" body={(data) => <img className="shadow-2" src={data.mainImage} alt={data.name} width="50" />} />
                         <Column field="name" header="Name" sortable style={{ width: '35%' }} />
                         <Column field="price" header="Price" sortable style={{ width: '35%' }} body={(data) => formatCurrency(data.price)} />
                         <Column
