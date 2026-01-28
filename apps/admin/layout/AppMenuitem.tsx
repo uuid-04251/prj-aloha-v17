@@ -1,12 +1,11 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Ripple } from 'primereact/ripple';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useContext } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { MenuContext } from './context/menucontext';
-import { AppMenuItemProps } from '@/types';
+import { AppMenuItemProps, MenuModelItem } from '@/types';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const AppMenuitem = (props: AppMenuItemProps) => {
@@ -37,7 +36,7 @@ const AppMenuitem = (props: AppMenuItemProps) => {
 
         //execute command
         if (item!.command) {
-            item!.command({ originalEvent: event, item: item });
+            item!.command({ originalEvent: event, item: item as MenuModelItem });
         }
 
         // toggle active state

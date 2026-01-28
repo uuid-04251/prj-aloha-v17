@@ -1,10 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
-
-import React, { useContext } from 'react';
-import { LayoutContext } from './context/layoutcontext';
+import React from 'react';
 
 const AppFooter = () => {
-    const { layoutConfig } = useContext(LayoutContext);
+    // const { layoutConfig } = useContext(LayoutContext);
 
     return (
         <div className="layout-footer">

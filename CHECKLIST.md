@@ -10,9 +10,10 @@ Dưới đây là checklist tối ưu repo cần thực hiện ngay cho monorepo
 
 ## 2. Update Dependencies (High Priority)
 
-- [ ] Cập nhật packages outdated, đặc biệt Next.js (hiện 13.4.8 deprecated).
-- [ ] Chạy `pnpm update --latest`, test build/lint sau đó.
-- [ ] Lý do: Fix bugs, security, performance improvements.
+- [x] Cập nhật packages outdated, đặc biệt Next.js (đã update từ 13.4.8 lên 16.1.6).
+- [x] Chạy `pnpm update --latest`, test build/lint sau đó.
+- [x] Migrate ESLint từ v8 lên v9 flat config.
+- [x] Lý do: Fix bugs, security, performance improvements.
 
 ## 3. Add Basic CI/CD (High Priority)
 

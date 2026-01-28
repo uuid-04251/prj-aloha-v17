@@ -5,12 +5,12 @@ import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Menu } from 'primereact/menu';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ProductService } from '../../services/ProductService';
 import { LayoutContext } from '../../layout/context/layoutcontext';
 import Link from 'next/link';
 import { Demo } from '@/types';
-import { ChartData, ChartOptions } from 'chart.js';
+import { ChartData } from 'chart.js';
 
 const lineData: ChartData = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -38,84 +38,71 @@ const Dashboard = () => {
     const [products, setProducts] = useState<Demo.Product[]>([]);
     const menu1 = useRef<Menu>(null);
     const menu2 = useRef<Menu>(null);
-    const [lineOptions, setLineOptions] = useState<ChartOptions>({});
     const { layoutConfig } = useContext(LayoutContext);
 
-    const applyLightTheme = () => {
-        const lineOptions: ChartOptions = {
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#495057'
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: '#495057'
-                    },
-                    grid: {
-                        color: '#ebedef'
+    const lineOptions = useMemo(() => {
+        if (layoutConfig.colorScheme === 'light') {
+            return {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#495057'
+                        }
                     }
                 },
-                y: {
-                    ticks: {
-                        color: '#495057'
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: '#ebedef'
+                        }
                     },
-                    grid: {
-                        color: '#ebedef'
+                    y: {
+                        ticks: {
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: '#ebedef'
+                        }
                     }
                 }
-            }
-        };
-
-        setLineOptions(lineOptions);
-    };
-
-    const applyDarkTheme = () => {
-        const lineOptions = {
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#ebedef'
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: '#ebedef'
-                    },
-                    grid: {
-                        color: 'rgba(160, 167, 181, .3)'
+            };
+        } else {
+            return {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#ebedef'
+                        }
                     }
                 },
-                y: {
-                    ticks: {
-                        color: '#ebedef'
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#ebedef'
+                        },
+                        grid: {
+                            color: 'rgba(160, 167, 181, .3)'
+                        }
                     },
-                    grid: {
-                        color: 'rgba(160, 167, 181, .3)'
+                    y: {
+                        ticks: {
+                            color: '#ebedef'
+                        },
+                        grid: {
+                            color: 'rgba(160, 167, 181, .3)'
+                        }
                     }
                 }
-            }
-        };
-
-        setLineOptions(lineOptions);
-    };
+            };
+        }
+    }, [layoutConfig.colorScheme]);
 
     useEffect(() => {
         ProductService.getProducts().then((data) => setProducts(data));
     }, []);
-
-    useEffect(() => {
-        if (layoutConfig.colorScheme === 'light') {
-            applyLightTheme();
-        } else {
-            applyDarkTheme();
-        }
-    }, [layoutConfig.colorScheme]);
 
     const formatCurrency = (value: number) => {
         return value?.toLocaleString('en-US', {

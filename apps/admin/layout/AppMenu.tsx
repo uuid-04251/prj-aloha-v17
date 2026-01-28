@@ -1,14 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
-
-import React, { useContext } from 'react';
+import React from 'react';
 import AppMenuitem from './AppMenuitem';
-import { LayoutContext } from './context/layoutcontext';
 import { MenuProvider } from './context/menucontext';
-import Link from 'next/link';
 import { AppMenuItem } from '@/types';
 
 const AppMenu = () => {
-    const { layoutConfig } = useContext(LayoutContext);
+    // const { layoutConfig } = useContext(LayoutContext);
 
     const model: AppMenuItem[] = [
         {

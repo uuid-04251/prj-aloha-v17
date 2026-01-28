@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import {
     Page,
     AppBreadcrumbProps,
@@ -6,11 +6,9 @@ import {
     BreadcrumbItem,
     MenuProps,
     MenuModel,
-    AppSubMenuProps,
+    MenuModelItem,
     LayoutConfig,
     LayoutState,
-    AppBreadcrumbState,
-    Breadcrumb,
     LayoutContextProps,
     MailContextProps,
     MenuContextProps,
@@ -19,7 +17,6 @@ import {
     AppConfigProps,
     NodeRef,
     AppTopbarRef,
-    MenuModelItem,
     AppMenuItemProps,
     AppMenuItem
 } from './layout';
@@ -36,6 +33,7 @@ export type {
     BreadcrumbItem,
     MenuProps,
     MenuModel,
+    MenuModelItem,
     LayoutConfig,
     LayoutState,
     Breadcrumb,

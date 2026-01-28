@@ -67,7 +67,7 @@ const CategoryPage = () => {
                     life: 3000
                 });
             })
-            .catch((error: unknown) => {
+            .catch((_error: unknown) => {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
@@ -98,7 +98,7 @@ const CategoryPage = () => {
                             life: 3000
                         });
                     })
-                    .catch((error: unknown) => {
+                    .catch((_error: unknown) => {
                         toast.current?.show({
                             severity: 'error',
                             summary: 'Error',

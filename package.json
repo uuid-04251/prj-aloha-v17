@@ -2,6 +2,7 @@
     "name": "aloha-monorepo",
     "version": "1.0.0",
     "private": true,
+    "type": "module",
     "workspaces": [
         "apps/*"
     ],
@@ -15,10 +16,15 @@
         "prepare": "husky"
     },
     "devDependencies": {
-        "eslint": "^8.0.0",
-        "eslint-config-next": "13.4.6",
+        "@eslint/eslintrc": "^3.3.3",
+        "@eslint/js": "^9.39.2",
+        "@typescript-eslint/parser": "^8.54.0",
+        "eslint": "^9.39.2",
+        "eslint-config-next": "16.1.6",
+        "eslint-plugin-react": "^7.37.5",
+        "globals": "^17.2.0",
         "husky": "^9.1.7",
-        "prettier": "^3.0.0",
-        "typescript": "5.1.3"
+        "prettier": "^3.8.1",
+        "typescript": "5.9.3"
     }
 }

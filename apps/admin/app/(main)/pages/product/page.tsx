@@ -81,7 +81,7 @@ const ProductPage = () => {
                     life: 3000
                 });
             })
-            .catch((error: unknown) => {
+            .catch((_error: unknown) => {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
@@ -115,7 +115,7 @@ const ProductPage = () => {
                             life: 3000
                         });
                     })
-                    .catch((error: unknown) => {
+                    .catch((_error: unknown) => {
                         toast.current?.show({
                             severity: 'error',
                             summary: 'Error',
@@ -136,7 +136,7 @@ const ProductPage = () => {
                             life: 3000
                         });
                     })
-                    .catch((error: unknown) => {
+                    .catch((_error: unknown) => {
                         toast.current?.show({
                             severity: 'error',
                             summary: 'Error',
@@ -214,7 +214,6 @@ const ProductPage = () => {
 
     const stockBodyTemplate = (rowData: Product) => {
         const severity = rowData.stock > 20 ? 'success' : rowData.stock > 0 ? 'warning' : 'danger';
-        const label = rowData.stock > 20 ? 'In Stock' : rowData.stock > 0 ? 'Low Stock' : 'Out of Stock';
 
         return <Tag value={`${rowData.stock} units`} severity={severity} />;
     };
@@ -249,10 +248,6 @@ const ProductPage = () => {
     // Skeleton templates
     const nameSkeletonTemplate = () => {
         return <Skeleton width="85%" height="1.2rem" />;
-    };
-
-    const descriptionSkeletonTemplate = () => {
-        return <Skeleton width="95%" height="1.2rem" />;
     };
 
     const priceSkeletonTemplate = () => {

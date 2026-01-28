@@ -1,7 +1,4 @@
-import React, { ReactElement, Dispatch, SetStateAction, HTMLAttributeAnchorTarget, ReactNode } from 'react';
-import { NextPage } from 'next';
-import { Demo } from './demo';
-import { Toast } from 'primereact/toast';
+import React, { Dispatch, SetStateAction, HTMLAttributeAnchorTarget, ReactNode, MutableRefObject } from 'react';
 
 /* Breadcrumb Types */
 export interface AppBreadcrumbProps {
@@ -66,26 +63,26 @@ export interface AppTopbarRef {
 }
 
 /* AppMenu Types */
-type CommandProps = {
-    originalEvent: React.MouseEvent<HTMLAnchorElement, MouseEvent>;
-    item: MenuModelItem;
-};
-
-export interface MenuProps {
-    model: MenuModel[];
-}
-
-export interface MenuModel {
+export interface MenuModelItem {
     label: string;
     icon?: string;
-    items?: MenuModel[];
+    items?: MenuModelItem[];
     to?: string;
     url?: string;
     target?: HTMLAttributeAnchorTarget;
     seperator?: boolean;
 }
 
-export interface AppMenuItem extends MenuModel {
+type CommandProps = {
+    originalEvent: React.MouseEvent<HTMLAnchorElement, MouseEvent>;
+    item: MenuModelItem;
+};
+
+export interface MenuProps {
+    model: MenuModelItem[];
+}
+
+export interface AppMenuItem extends MenuModelItem {
     items?: AppMenuItem[];
     badge?: 'UPDATED' | 'NEW';
     badgeClass?: string;
@@ -94,7 +91,7 @@ export interface AppMenuItem extends MenuModel {
     visible?: boolean;
     disabled?: boolean;
     replaceUrl?: boolean;
-    command?: ({ originalEvent, item }: CommandProps) => void;
+    command?: ({ originalEvent: _originalEvent, item: _item }: CommandProps) => void;
 }
 
 export interface AppMenuItemProps {

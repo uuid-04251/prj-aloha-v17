@@ -7,7 +7,7 @@
         "build": "next build",
         "start": "next start",
         "format": "prettier --write \"{app,demo,layout,types}/**/*.{js,ts,tsx,d.ts}\"",
-        "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
+        "lint": "cd ../.. && eslint apps/admin --ext .ts,.tsx,.js,.jsx --ignore-pattern 'apps/admin/.next/**' --ignore-pattern 'node_modules/**'"
     },
     "dependencies": {
         "@types/node": "20.3.1",
