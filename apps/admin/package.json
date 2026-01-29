@@ -8,9 +8,12 @@
         "start": "next start",
         "format": "prettier --write \"{app,demo,layout,types}/**/*.{js,ts,tsx,d.ts}\"",
         "lint": "cd ../.. && eslint apps/admin --ext .ts,.tsx,.js,.jsx --ignore-pattern 'apps/admin/.next/**' --ignore-pattern 'node_modules/**'",
+        "lint:fix": "cd ../.. && eslint apps/admin --ext .ts,.tsx,.js,.jsx --ignore-pattern 'apps/admin/.next/**' --ignore-pattern 'node_modules/**' --fix",
+        "type-check": "tsc --noEmit",
         "test": "jest --config jest.config.js",
         "test:watch": "jest --watch --config jest.config.js",
-        "test:coverage": "jest --coverage --config jest.config.js"
+        "test:coverage": "jest --coverage --config jest.config.js",
+        "clean": "rm -rf .next"
     },
     "dependencies": {
         "@types/node": "20.3.1",
