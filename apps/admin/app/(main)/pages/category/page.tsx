@@ -7,15 +7,15 @@ import { Toast } from 'primereact/toast';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports for PrimeReact components
-const DataTable = dynamic(() => import('primereact/datatable').then(mod => ({ default: mod.DataTable })));
-const Column = dynamic(() => import('primereact/column').then(mod => ({ default: mod.Column })));
-const Button = dynamic(() => import('primereact/button').then(mod => ({ default: mod.Button })));
-const Dialog = dynamic(() => import('primereact/dialog').then(mod => ({ default: mod.Dialog })));
-const InputText = dynamic(() => import('primereact/inputtext').then(mod => ({ default: mod.InputText })));
-const InputTextarea = dynamic(() => import('primereact/inputtextarea').then(mod => ({ default: mod.InputTextarea })));
-const Dropdown = dynamic(() => import('primereact/dropdown').then(mod => ({ default: mod.Dropdown })));
-const ConfirmDialog = dynamic(() => import('primereact/confirmdialog').then(mod => ({ default: mod.ConfirmDialog })));
-const Skeleton = dynamic(() => import('primereact/skeleton').then(mod => ({ default: mod.Skeleton })));
+const DataTable = dynamic(() => import('primereact/datatable').then((mod) => ({ default: mod.DataTable })));
+const Column = dynamic(() => import('primereact/column').then((mod) => ({ default: mod.Column })));
+const Button = dynamic(() => import('primereact/button').then((mod) => ({ default: mod.Button })));
+const Dialog = dynamic(() => import('primereact/dialog').then((mod) => ({ default: mod.Dialog })));
+const InputText = dynamic(() => import('primereact/inputtext').then((mod) => ({ default: mod.InputText })));
+const InputTextarea = dynamic(() => import('primereact/inputtextarea').then((mod) => ({ default: mod.InputTextarea })));
+const Dropdown = dynamic(() => import('primereact/dropdown').then((mod) => ({ default: mod.Dropdown })));
+const ConfirmDialog = dynamic(() => import('primereact/confirmdialog').then((mod) => ({ default: mod.ConfirmDialog })));
+const Skeleton = dynamic(() => import('primereact/skeleton').then((mod) => ({ default: mod.Skeleton })));
 
 const CategoryPage = () => {
     let emptyCategory: Category = {

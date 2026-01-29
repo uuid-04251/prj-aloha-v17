@@ -7,10 +7,10 @@ import { ProductService } from '../../services/ProductService';
 import type { Product } from '../../services/ProductService';
 
 // Dynamic imports for PrimeReact components
-const Button = dynamic(() => import('primereact/button').then(mod => ({ default: mod.Button })));
-const Chart = dynamic(() => import('primereact/chart').then(mod => ({ default: mod.Chart })));
-const Column = dynamic(() => import('primereact/column').then(mod => ({ default: mod.Column })));
-const DataTable = dynamic(() => import('primereact/datatable').then(mod => ({ default: mod.DataTable })));
+const Button = dynamic(() => import('primereact/button').then((mod) => ({ default: mod.Button })));
+const Chart = dynamic(() => import('primereact/chart').then((mod) => ({ default: mod.Chart })));
+const Column = dynamic(() => import('primereact/column').then((mod) => ({ default: mod.Column })));
+const DataTable = dynamic(() => import('primereact/datatable').then((mod) => ({ default: mod.DataTable })));
 
 import dynamic from 'next/dynamic';
 
