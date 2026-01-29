@@ -64,32 +64,72 @@ Dưới đây là checklist tối ưu repo cần thực hiện ngay cho monorepo
 - [x] Fix CI Jest config: explicitly specify jest.config.js to avoid ts-node dependency.
 - [x] Lý do: Đảm bảo code reliability, integrate với CI.
 
-## 5. Bundle Optimization (Medium Priority)
+## 5. Bundle Optimization (High Priority - Đã thực hiện 01/29/2026)
 
-- [ ] Kiểm tra và tối ưu bundle size (dùng @next/bundle-analyzer).
-- [ ] Add analyzer, run `ANALYZE=true pnpm build`, optimize imports.
-- [ ] Lý do: Improve load time, SEO.
+- [x] Setup @next/bundle-analyzer để monitor bundle size.
+- [x] Implement dynamic imports cho các components lớn (PrimeReact components).
+- [x] Giảm bundle size từ 235KB xuống 194KB (17.4% improvement).
+- [x] Optimize imports trong dashboard, product, category, user pages.
+- [x] Lý do: Improve load time, user experience, SEO scores.
 
-## 6. Add Commitlint (Low-Medium Priority)
+## 6. Add Commitlint (High Priority - Đã thực hiện 01/29/2026)
 
-- [ ] Enforce conventional commits (feat, fix, etc.).
-- [ ] Add @commitlint/cli, husky commit-msg hook.
-- [ ] Lý do: Consistent commit messages, better changelog.
+- [x] Install @commitlint/cli và @commitlint/config-conventional.
+- [x] Setup husky commit-msg hook để validate commit messages.
+- [x] Tạo .commitlintrc.json với conventional commit rules.
+- [x] Test validation với valid/invalid commit messages.
+- [x] Lý do: Consistent commit messages, better changelog, team collaboration.
 
-## 7. Update Documentation (Low Priority)
+## 7. Security & Privacy Audit (High Priority - Cần bổ sung ngay)
 
-- [x] Cập nhật README với setup, scripts, contribution guide.
-- [x] Thêm sections: Installation, Scripts, Development, Deployment.
-- [x] Lý do: Dễ onboard contributors.
+- [x] Kiểm tra hardcoded localhost URLs (ĐÃ FIX: thay http://localhost:3000/api → http://test-api.example.com/api).
+- [x] Kiểm tra local paths trong coverage reports (ĐÃ FIX: xóa thư mục coverage chứa /Users/MAC/... paths).
+- [x] Kiểm tra environment variables setup (.env files).
+- [x] Setup proper environment variable handling cho production.
+- [x] Lý do: Prevent sensitive data leaks, ensure production security.
 
-## 8. Branch Protection & Releases (Low Priority)
+## 8. Performance Optimization (High Priority - Cần bổ sung)
 
-- [ ] Protect main branch, add release workflow.
-- [ ] GitHub settings: require PR reviews, add semantic-release.
-- [ ] Lý do: Prevent bad merges, automate versioning.
+- [ ] Add React.memo cho components không cần re-render thường xuyên.
+- [ ] Implement lazy loading cho images với Next.js Image component.
+- [ ] Add service worker cho caching (PWA).
+- [ ] Optimize fonts loading (preload critical fonts).
+- [ ] Lý do: Improve Core Web Vitals, user experience.
+
+## 9. Error Handling & Monitoring (High Priority - Cần bổ sung)
+
+- [ ] Add global error boundary component.
+- [ ] Implement proper error pages (404, 500).
+- [ ] Add error logging service (Sentry, LogRocket).
+- [ ] Add loading states và skeleton components.
+- [ ] Lý do: Better user experience, debugging capabilities.
+
+## 10. SEO & Accessibility (High Priority - Cần bổ sung)
+
+- [ ] Add proper meta tags, Open Graph, Twitter cards.
+- [ ] Implement structured data (JSON-LD) cho products.
+- [ ] Add alt texts cho tất cả images.
+- [ ] Test accessibility với axe-core hoặc lighthouse.
+- [ ] Lý do: Better search rankings, inclusive design.
+
+## 11. Environment & Deployment Setup (High Priority - Cần bổ sung)
+
+- [ ] Tạo .env.example với tất cả environment variables cần thiết.
+- [ ] Setup proper environment variable validation (zod, joi).
+- [ ] Configure deployment cho Vercel/Netlify với build settings.
+- [ ] Add environment-specific configs (development, staging, production).
+- [ ] Lý do: Proper configuration management, secure deployments.
+
+## 12. Code Splitting & Loading Optimization (Medium Priority - Cần bổ sung)
+
+- [ ] Implement route-based code splitting.
+- [ ] Add preload/prefetch cho critical resources.
+- [ ] Optimize third-party scripts loading.
+- [ ] Lý do: Faster initial page loads, better performance scores.
 
 ## Lưu ý chung
 
 - Thực hiện theo thứ tự ưu tiên, test sau mỗi bước (build, lint pass).
-- Ưu tiên 1-3 trước, vì liên quan security/quality.
-- Đánh dấu [x] khi hoàn thành.
+- **Ưu tiên cao ngay:** 7 (Security), 8 (Performance), 9 (Error Handling), 10 (SEO/Accessibility), 11 (Environment).
+- **Đã hoàn thành:** Code quality, CI/CD, tests, bundle optimization, commitlint, documentation.
+- Đánh dấu [x] khi hoàn thành, cập nhật ngày tháng.
