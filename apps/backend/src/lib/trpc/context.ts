@@ -1,6 +1,7 @@
-import { JWTPayload } from '@/lib/auth';
 import { type CreateFastifyContextOptions } from '@trpc/server/adapters/fastify';
 import { type CreateWSSContextFnOptions } from '@trpc/server/adapters/ws';
+import { env } from '../../util/env';
+import { JWTPayload } from '../auth';
 // Context type for HTTP requests
 export function createContext({ req, res }: CreateFastifyContextOptions) {
     return {

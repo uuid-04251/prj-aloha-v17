@@ -1,5 +1,5 @@
-import { hashPassword, verifyPassword, generateAccessToken, generateRefreshToken, type JWTPayload } from '@/lib/auth';
-import { logger } from '@/util/logger';
+import { hashPassword, verifyPassword, generateAccessToken, generateRefreshToken, type JWTPayload } from '../../lib/auth';
+import { logger } from '../../util/logger';
 
 // User interface for auth operations
 export interface AuthUser {
@@ -119,7 +119,7 @@ export class AuthService {
     }
 
     // Refresh access token
-    async refreshToken(_refreshToken: string): Promise<{
+    async refreshToken(refreshToken: string): Promise<{
         accessToken: string;
         refreshToken: string;
     }> {

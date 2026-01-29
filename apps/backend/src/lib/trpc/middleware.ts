@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
-import { extractTokenFromHeader, verifyToken, type JWTPayload } from '@/lib/auth';
+import { middleware, publicProcedure } from './trpc';
+import { extractTokenFromHeader, verifyToken, type JWTPayload } from '../auth';
 import type { Context } from './context';
-import { middleware } from './trpc';
 
 // Auth middleware - requires valid JWT token
 export const authMiddleware = middleware(async ({ ctx, next }) => {

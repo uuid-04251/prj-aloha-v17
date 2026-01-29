@@ -1,5 +1,5 @@
 import { initTRPC } from '@trpc/server';
-import { logger } from '@/util/logger';
+import { logger } from '../../util/logger';
 
 // Initialize tRPC
 const t = initTRPC.create({

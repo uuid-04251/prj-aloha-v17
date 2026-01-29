@@ -1,7 +1,7 @@
 import { router, publicProcedure } from './trpc';
 
 // Import domain routers
-import { authRouter } from '@/resources/auth/auth.router';
+import { authRouter } from '../../resources/auth/auth.router';
 
 // Create main app router
 export const appRouter = router({

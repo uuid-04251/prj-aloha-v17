@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { publicProcedure } from '@/lib/trpc/trpc';
+import { publicProcedure } from '../../lib/trpc/trpc';
 import { authService } from './auth.service';
 
 // Input validation schemas
@@ -38,7 +38,7 @@ export const authProcedures = {
     }),
 
     // Logout procedure (requires authentication)
-    logout: publicProcedure.mutation(async () => {
+    logout: publicProcedure.mutation(async ({ ctx }) => {
         // TODO: Get userId from authenticated context
         const userId = 'user-123'; // Mock for now
         return authService.logout(userId);

@@ -2,11 +2,11 @@ import fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
-import { appRouter } from '@/lib/trpc/router';
-import { createContext } from '@/lib/trpc/context';
-import { logger } from '@/util/logger';
-import { env } from '@/util/env';
-import { connectToDatabase } from '@/lib/db/connection';
+import { appRouter } from './lib/trpc/router';
+import { createContext } from './lib/trpc/context';
+import { logger } from './util/logger';
+import { env } from './util/env';
+import { connectToDatabase } from './lib/db/connection';
 
 // Load environment variables
 import dotenv from 'dotenv';

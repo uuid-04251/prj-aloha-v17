@@ -1,4 +1,4 @@
-import { router } from '@/lib/trpc/trpc';
+import { router } from '../../lib/trpc/trpc';
 import { authProcedures } from './auth.procedures';
 
 // Auth router combining all auth procedures

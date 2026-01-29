@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { env } from '@/util/env';
-import { logger } from '@/util/logger';
+import { env } from '../../util/env';
+import { logger } from '../../util/logger';
 
 let isConnected = false;
 
