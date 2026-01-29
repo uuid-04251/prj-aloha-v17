@@ -26,7 +26,95 @@ docs/
 ├── conventions.md  # This file
 ```
 
-## 3. File Naming Conventions
+## 3. Backend Modular Clean Architecture Structure
+
+```
+apps/backend/src/
+├── modules/        # Business modules (modular approach)
+│   ├── user/       # User management module
+│   │   ├── entities/    # User entity
+│   │   ├── services/    # User business logic
+│   │   ├── routes/      # User tRPC routes
+│   │   ├── schemas/     # User Zod schemas
+│   │   └── repositories/# User repository
+│   ├── product/    # Product management module
+│   │   ├── entities/    # Product entity
+│   │   ├── services/    # Product business logic
+│   │   ├── routes/      # Product tRPC routes
+│   │   ├── schemas/     # Product Zod schemas
+│   │   └── repositories/# Product repository
+│   └── category/   # Category management module
+│       ├── entities/    # Category entity
+│       ├── services/    # Category business logic
+│       ├── routes/      # Category tRPC routes
+│       ├── schemas/     # Category Zod schemas
+│       └── repositories/# Category repository
+├── infrastructure/ # External concerns
+│   ├── database/   # MongoDB models & shared repositories
+│   ├── external/   # External APIs, services
+│   └── config/     # Configuration
+├── presentation/   # Interface adapters
+│   ├── server/     # Fastify server setup
+│   ├── routes/     # Main tRPC router composition
+│   ├── middlewares/# Fastify middlewares
+│   └── schemas/    # Shared Zod schemas
+├── shared/         # Shared utilities
+│   ├── utils/      # Pure utility functions
+│   ├── types/      # Shared types
+│   └── constants/  # Application constants
+└── index.ts        # Application entry point
+```
+
+## 4. Clean Architecture Guidelines
+
+- **Dependency Rule**: Inner layers cannot depend on outer layers
+- **Domain Layer**: Pure business logic, no external dependencies
+- **Application Layer**: Orchestrates domain objects, use cases
+- **Infrastructure Layer**: Implements interfaces defined in inner layers
+- **Presentation Layer**: Translates between external world and application
+- **Dependency Injection**: Use constructor injection for testability
+- **Error Handling**: Domain errors vs infrastructure errors
+- **Validation**: Input validation at boundaries (Zod schemas)
+
+## 5. Fastify Best Practices
+
+- **Plugins**: Use plugins for reusable functionality
+- **Hooks**: Prefer `onRequest` for auth, `preHandler` for validation
+- **Decorators**: Use for request/response augmentation
+- **Error Handling**: Use `setErrorHandler` for global error handling
+- **Logging**: Structured logging with Pino
+- **CORS**: Configure based on environment
+- **Rate Limiting**: Implement per route or global
+- **Validation**: Use Fastify's built-in validation with schemas
+
+## 6. tRPC Guidelines
+
+- **Procedures**: Use `publicProcedure` for public, `protectedProcedure` for auth
+- **Input/Output**: Always validate with Zod schemas
+- **Error Handling**: Use tRPC's error formatting
+- **Middleware**: Create reusable middleware for auth, logging
+- **Type Safety**: Leverage tRPC's end-to-end type safety
+- **Router Composition**: Compose routers for better organization
+
+## 7. Database & Models
+
+- **Mongoose**: Use schemas with validation
+- **Repositories**: Implement repository pattern for data access
+- **Transactions**: Use for multi-document operations
+- **Indexing**: Add indexes for query performance
+- **Migration**: Version control schema changes
+- **Connection**: Use connection pooling and error handling
+
+## 8. Error Handling Patterns
+
+- **Domain Errors**: Business logic errors (e.g., UserNotFoundError)
+- **Application Errors**: Use case errors
+- **Infrastructure Errors**: External service errors
+- **HTTP Errors**: Map to appropriate HTTP status codes
+- **Logging**: Log errors with context, not sensitive data
+- **Recovery**: Implement retry logic where appropriate
+
+## 9. File Naming Conventions
 
 - **Files**: kebab-case (e.g., `user-service.ts`, `product-schema.ts`)
 - **Directories**: kebab-case (e.g., `user-management/`)
