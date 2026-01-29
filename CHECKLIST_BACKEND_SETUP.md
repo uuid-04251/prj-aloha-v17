@@ -4,13 +4,13 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 
 ## 0. Setup Coding Conventions (Prerequisite)
 
-- [ ] Tạo file `docs/conventions.md` với coding standards cho dự án
-- [ ] Đảm bảo AI agents và developers tuân thủ conventions
+- [x] Tạo file `docs/conventions.md` với coding standards cho dự án
+- [x] Đảm bảo AI agents và developers tuân thủ conventions
 
 ## 1. Chuẩn bị Cấu trúc Dự án (Critical)
 
-- [ ] Tạo thư mục `apps/backend/` trong workspace
-- [ ] Khởi tạo `package.json` cho backend app với dependencies cơ bản:
+- [x] Tạo thư mục `apps/backend/` trong workspace
+- [x] Khởi tạo `package.json` cho backend app với dependencies cơ bản:
     - fastify
     - @trpc/server
     - @trpc/client
@@ -26,19 +26,19 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
     - @types/jsonwebtoken
     - @types/bcryptjs
     - typescript
-- [ ] Tạo `tsconfig.json` với cấu hình phù hợp cho Node.js
-- [ ] Cập nhật `pnpm-workspace.yaml` nếu cần (đã có `apps/*`)
+- [x] Tạo `tsconfig.json` với cấu hình phù hợp cho Node.js
+- [x] Cập nhật `pnpm-workspace.yaml` nếu cần (đã có `apps/*`)
 
 ## 2. Cài đặt Dependencies (High Priority)
 
-- [ ] Chạy `pnpm install` trong `apps/backend/`
-- [ ] Thêm dev dependencies: nodemon, ts-node, tsx, concurrently
-- [ ] Thêm testing dependencies: jest, @types/jest, supertest, @types/supertest
-- [ ] Verify dependencies: Chạy `pnpm list` để kiểm tra
+- [x] Chạy `pnpm install` trong `apps/backend/`
+- [x] Thêm dev dependencies: nodemon, ts-node, tsx, concurrently
+- [x] Thêm testing dependencies: jest, @types/jest, supertest, @types/supertest
+- [x] Verify dependencies: Chạy `pnpm list` để kiểm tra
 
 ## 3. Thiết lập Cấu trúc Thư mục - FOCUS Auth/User (High Priority)
 
-- [ ] Tạo cấu trúc thư mục cơ bản:
+- [x] Tạo cấu trúc thư mục cơ bản:
     ```
     apps/backend/
     ├── src/
@@ -67,35 +67,35 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
     ├── tests/                         # Test files (optional for now)
     └── package.json
     ```
-- [ ] Tạo file entry point: `src/server.ts`
+- [x] Tạo file entry point: `src/server.ts`
 
 ## 4. Cấu hình Database - MongoDB (Critical)
 
-- [ ] Setup MongoDB connection trong `src/lib/db/connection.ts`
-- [ ] Tạo environment variables: `.env` với MONGODB_URI
-- [ ] Tạo `.env.example` với template environment variables
-- [ ] Tạo connection utility và error handling
-- [ ] Test database connection
+- [x] Setup MongoDB connection trong `src/lib/db/connection.ts`
+- [x] Tạo environment variables: `.env` với MONGODB_URI
+- [x] Tạo `.env.example` với template environment variables
+- [x] Tạo connection utility và error handling
+- [x] Test database connection
 
 ## 5. Thiết lập tRPC và Fastify - Core Setup (High Priority)
 
-- [ ] Khởi tạo tRPC setup trong `src/lib/trpc/trpc.ts`
-- [ ] Tạo context trong `src/lib/trpc/context.ts`
-- [ ] Setup middleware trong `src/lib/trpc/middleware.ts` (JWT auth)
-- [ ] Tạo main router trong `src/lib/trpc/router.ts`
-- [ ] Tạo Fastify server trong `src/server.ts` với tRPC adapter
-- [ ] Setup CORS, logging middleware
-- [ ] Tạo hello world route để test
+- [x] Khởi tạo tRPC setup trong `src/lib/trpc/trpc.ts`
+- [x] Tạo context trong `src/lib/trpc/context.ts`
+- [x] Setup middleware trong `src/lib/trpc/middleware.ts` (JWT auth)
+- [x] Tạo main router trong `src/lib/trpc/router.ts`
+- [x] Tạo Fastify server trong `src/server.ts` với tRPC adapter
+- [x] Setup CORS, logging middleware
+- [x] Tạo hello world route để test
 
 ## 6. Tạo Auth Resource - CORE FEATURE (High Priority)
 
-- [ ] Tạo `src/resources/auth/` structure:
+- [x] Tạo `src/resources/auth/` structure:
     - `auth.service.ts` - JWT token generation, password hashing/verification
     - `auth.procedures.ts` - login, register, logout, refresh token
     - `auth.router.ts` - Auth TRPC router
-- [ ] Implement JWT utilities trong `src/lib/auth.ts`
-- [ ] Setup password hashing với bcryptjs
-- [ ] Create login/register procedures
+- [x] Implement JWT utilities trong `src/lib/auth.ts`
+- [x] Setup password hashing với bcryptjs
+- [x] Create login/register procedures
 
 ## 7. Tạo Users Resource - CORE FEATURE (High Priority)
 

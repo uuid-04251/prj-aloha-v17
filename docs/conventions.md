@@ -1,240 +1,351 @@
-# Coding Conventions for Aloha Project
+# Coding Conventions - Aloha Backend
 
-## Overview
+Dưới đây là coding standards và conventions cho dự án Aloha Backend (Fastify + tRPC + Zod + MongoDB + JWT).
 
-This document outlines the coding conventions and standards for the Aloha project. These conventions ensure consistency, maintainability, and efficiency across the codebase, especially for AI agents working on the project.
-
-## 1. General Principles
-
-- **Consistency**: Follow the established patterns in the codebase
-- **Readability**: Code should be self-documenting
-- **Maintainability**: Easy to modify and extend
-- **Performance**: Optimize where necessary
-- **Security**: Follow security best practices
-
-## 2. Project Structure
+## 1. Project Structure
 
 ```
-apps/
-├── admin/          # Next.js admin app
-├── backend/        # Fastify + tRPC backend
-docs/
-├── architecture/
-├── business-logic/
-├── database/
-├── deployment/
-├── conventions.md  # This file
+apps/backend/
+├── src/
+│   ├── resources/                 # Business logic by domain
+│   │   ├── {domain}/
+│   │   │   ├── {domain}.service.ts        # Business logic
+│   │   │   ├── {domain}.procedures.ts     # TRPC procedures
+│   │   │   └── {domain}.router.ts         # TRPC router for domain
+│   ├── lib/                       # Infrastructure
+│   │   ├── trpc/
+│   │   │   ├── router.ts              # Main TRPC router assembly
+│   │   │   ├── context.ts             # Request context
+│   │   │   ├── middleware.ts          # Auth middleware
+│   │   │   └── trpc.ts                # TRPC setup
+│   │   ├── db/connection.ts           # MongoDB setup
+│   │   ├── auth.ts                    # JWT utilities
+│   │   ├── errors/                    # Custom errors
+│   │   └── ...                       # Other infrastructure
+│   ├── util/                      # Utilities
+│   │   ├── env.ts                  # Environment helpers
+│   │   └── logger.ts               # Logging utilities
+│   └── server.ts                  # Server setup
+├── tests/                         # Test files
+│   ├── integration/               # Integration tests by domain
+│   │   ├── {domain}/{feature}.test.ts
+│   └── utils/                     # Test utilities
+└── package.json
 ```
 
-## 3. Backend Modular Clean Architecture Structure
+## 2. Naming Conventions
 
-```
-apps/backend/src/
-├── modules/        # Business modules (modular approach)
-│   ├── user/       # User management module
-│   │   ├── entities/    # User entity
-│   │   ├── services/    # User business logic
-│   │   ├── routes/      # User tRPC routes
-│   │   ├── schemas/     # User Zod schemas
-│   │   └── repositories/# User repository
-│   ├── product/    # Product management module
-│   │   ├── entities/    # Product entity
-│   │   ├── services/    # Product business logic
-│   │   ├── routes/      # Product tRPC routes
-│   │   ├── schemas/     # Product Zod schemas
-│   │   └── repositories/# Product repository
-│   └── category/   # Category management module
-│       ├── entities/    # Category entity
-│       ├── services/    # Category business logic
-│       ├── routes/      # Category tRPC routes
-│       ├── schemas/     # Category Zod schemas
-│       └── repositories/# Category repository
-├── infrastructure/ # External concerns
-│   ├── database/   # MongoDB models & shared repositories
-│   ├── external/   # External APIs, services
-│   └── config/     # Configuration
-├── presentation/   # Interface adapters
-│   ├── server/     # Fastify server setup
-│   ├── routes/     # Main tRPC router composition
-│   ├── middlewares/# Fastify middlewares
-│   └── schemas/    # Shared Zod schemas
-├── shared/         # Shared utilities
-│   ├── utils/      # Pure utility functions
-│   ├── types/      # Shared types
-│   └── constants/  # Application constants
-└── index.ts        # Application entry point
-```
+### 2.1 Files and Directories
 
-## 4. Clean Architecture Guidelines
+- **Directories**: `camelCase` or `kebab-case` (e.g., `user-service`, `auth-utils`)
+- **Files**: `camelCase.ts` matching class/function name (e.g., `userService.ts`)
+- **Test Files**: `{fileName}.test.ts` or `{fileName}.spec.ts`
 
-- **Dependency Rule**: Inner layers cannot depend on outer layers
-- **Domain Layer**: Pure business logic, no external dependencies
-- **Application Layer**: Orchestrates domain objects, use cases
-- **Infrastructure Layer**: Implements interfaces defined in inner layers
-- **Presentation Layer**: Translates between external world and application
-- **Dependency Injection**: Use constructor injection for testability
-- **Error Handling**: Domain errors vs infrastructure errors
-- **Validation**: Input validation at boundaries (Zod schemas)
+### 2.2 Classes and Types
 
-## 5. Fastify Best Practices
+- **Classes**: `PascalCase` (e.g., `UserService`, `AuthMiddleware`)
+- **Interfaces**: `PascalCase` with `I` prefix (e.g., `IUser`, `IAuthService`)
+- **Types**: `PascalCase` (e.g., `User`, `CreateUserInput`)
+- **Enums**: `PascalCase` (e.g., `UserRole`, `AuthStatus`)
 
-- **Plugins**: Use plugins for reusable functionality
-- **Hooks**: Prefer `onRequest` for auth, `preHandler` for validation
-- **Decorators**: Use for request/response augmentation
-- **Error Handling**: Use `setErrorHandler` for global error handling
-- **Logging**: Structured logging with Pino
-- **CORS**: Configure based on environment
-- **Rate Limiting**: Implement per route or global
-- **Validation**: Use Fastify's built-in validation with schemas
+### 2.3 Functions and Variables
 
-## 6. tRPC Guidelines
+- **Functions**: `camelCase`, verb-first (e.g., `createUser`, `getUserById`, `validatePassword`)
+- **Variables**: `camelCase` (e.g., `userData`, `authToken`)
+- **Constants**: `SCREAMING_SNAKE_CASE` (e.g., `JWT_SECRET`, `DEFAULT_PORT`)
 
-- **Procedures**: Use `publicProcedure` for public, `protectedProcedure` for auth
-- **Input/Output**: Always validate with Zod schemas
-- **Error Handling**: Use tRPC's error formatting
-- **Middleware**: Create reusable middleware for auth, logging
-- **Type Safety**: Leverage tRPC's end-to-end type safety
-- **Router Composition**: Compose routers for better organization
+### 2.4 Database
 
-## 7. Database & Models
+- **Collections**: `camelCase` plural (e.g., `users`, `userSessions`)
+- **Fields**: `camelCase` (e.g., `firstName`, `lastName`, `createdAt`)
 
-- **Mongoose**: Use schemas with validation
-- **Repositories**: Implement repository pattern for data access
-- **Transactions**: Use for multi-document operations
-- **Indexing**: Add indexes for query performance
-- **Migration**: Version control schema changes
-- **Connection**: Use connection pooling and error handling
+## 3. Service Layer Pattern
 
-## 8. Error Handling Patterns
+### 3.1 Service Classes
 
-- **Domain Errors**: Business logic errors (e.g., UserNotFoundError)
-- **Application Errors**: Use case errors
-- **Infrastructure Errors**: External service errors
-- **HTTP Errors**: Map to appropriate HTTP status codes
-- **Logging**: Log errors with context, not sensitive data
-- **Recovery**: Implement retry logic where appropriate
+```typescript
+export class UserService {
+    // Methods: verb-first, camelCase
+    async createUser(data: CreateUserInput): Promise<User> {
+        // Implementation
+    }
 
-## 9. File Naming Conventions
+    async getUserById(userId: string): Promise<User | null> {
+        // Implementation
+    }
 
-- **Files**: kebab-case (e.g., `user-service.ts`, `product-schema.ts`)
-- **Directories**: kebab-case (e.g., `user-management/`)
-- **Components**: PascalCase (e.g., `UserCard.tsx`)
-- **Hooks**: camelCase with `use` prefix (e.g., `useUserData.ts`)
-- **Types/Interfaces**: PascalCase (e.g., `User.ts`, `ProductInterface.ts`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRY_COUNT`)
+    async updateUser(userId: string, data: UpdateUserInput): Promise<User> {
+        // Implementation
+    }
+}
 
-## 4. TypeScript Conventions
-
-- **Strict Mode**: Always enabled
-- **Types vs Interfaces**:
-    - Use `interface` for object shapes that may be extended
-    - Use `type` for unions, primitives, and complex types
-- **Naming**:
-    - Interfaces: PascalCase with `I` prefix optional (prefer no prefix)
-    - Types: PascalCase
-    - Generics: Single letter (T, U, V) or descriptive (TData, TError)
-- **Imports**: Group by external libraries, then internal modules
-- **Exports**: Prefer named exports over default exports
-
-## 5. Code Style
-
-- **Indentation**: 2 spaces
-- **Line Length**: Max 100 characters
-- **Semicolons**: Required
-- **Quotes**: Single quotes for strings, double for JSX attributes
-- **Trailing Commas**: Required in multiline objects/arrays
-
-## 6. Backend Specific Conventions (Fastify + tRPC + Zod + MongoDB)
-
-- **Routes**: Define in `src/routes/` with descriptive names
-- **Schemas**: Zod schemas in `src/schemas/` matching model names
-- **Models**: Mongoose models in `src/models/` with PascalCase
-- **Services**: Business logic in `src/services/` with Service suffix
-- **Utils**: Pure functions in `src/utils/`
-- **Config**: Environment-based config in `src/config/`
-- **Error Handling**: Use custom error classes, consistent error responses
-- **Validation**: All inputs validated with Zod schemas
-- **Authentication**: JWT-based, middleware for protected routes
-
-## 7. Frontend Specific Conventions (Next.js)
-
-- **Components**: Functional components with hooks
-- **Pages**: App Router structure in `app/`
-- **API Routes**: RESTful endpoints in `app/api/`
-- **Services**: Data fetching services in `services/`
-- **Styling**: SCSS modules or Tailwind CSS
-- **State Management**: React Context for global state
-- **Images**: Next.js Image component, lazy loading
-
-## 8. Testing Conventions
-
-- **Unit Tests**: For services, utils, and pure functions
-- **Integration Tests**: For API routes and database operations
-- **E2E Tests**: For critical user flows
-- **Test Files**: `.test.ts` or `.spec.ts` suffix
-- **Mocking**: Use appropriate mocks for external dependencies
-- **Coverage**: Aim for 80%+ coverage
-
-## 9. Commit Message Conventions
-
-Follow Conventional Commits:
-
-```
-type(scope): description
-
-Types: feat, fix, docs, style, refactor, test, chore
-Examples:
-- feat(auth): add JWT authentication
-- fix(user): resolve password reset bug
-- docs(readme): update installation guide
+// Export singleton instance
+export const userService = new UserService();
 ```
 
-## 10. Documentation
+### 3.2 Service Naming Rules
 
-- **Code Comments**: For complex logic, not obvious code
-- **README**: Project setup and usage
-- **API Docs**: Auto-generated from tRPC routes
-- **Architecture Docs**: High-level design decisions
+- **Class Name**: `PascalCase` + `Service` suffix, singular (e.g., `UserService`)
+- **File Name**: Match class name (e.g., `userService.ts`)
+- **Location**: `src/resources/{domain}/`
+- **Methods**: `camelCase`, verb-first
+- **Export**: Singleton instance as `camelCase`
 
-## 11. Security Practices
+## 4. TRPC Implementation
 
-- **Input Validation**: Always validate and sanitize inputs
-- **Authentication**: Secure JWT handling
-- **Authorization**: Role-based access control
-- **Data Protection**: Encrypt sensitive data
-- **Dependencies**: Regular security audits
+### 4.1 File Structure per Domain
 
-## 12. Performance Guidelines
+```
+src/resources/{domain}/
+├── {domain}.service.ts      # Business logic
+├── {domain}.procedures.ts   # TRPC procedures
+└── {domain}.router.ts       # TRPC router
+```
 
-- **Database**: Use indexes, avoid N+1 queries
-- **API**: Implement caching, rate limiting
-- **Frontend**: Code splitting, lazy loading
-- **Images**: Optimize and compress
+### 4.2 Router Assembly
 
-## 13. AI Agent Guidelines
+- **Main Router**: `src/lib/trpc/router.ts`
+- **Domain Routers**: Import and combine all domain routers
+- **Middleware**: `src/lib/trpc/middleware.ts`
 
-- **Context Awareness**: Always check existing code patterns before implementing
-- **Incremental Changes**: Make small, testable changes
-- **Validation**: Run tests and linting after changes
-- **Documentation**: Update docs when changing architecture
-- **Communication**: Explain changes clearly in commit messages
+### 4.3 Procedure Naming
 
-## 14. Tooling
+- **Public**: `camelCase` (e.g., `login`, `register`)
+- **Protected**: `camelCase` (e.g., `getProfile`, `updateUser`)
+- **Admin**: `adminCamelCase` (e.g., `adminGetUsers`)
 
-- **Package Manager**: pnpm for workspace management
-- **Linting**: ESLint with project config
-- **Formatting**: Prettier
-- **Type Checking**: TypeScript strict mode
-- **Testing**: Jest for unit/integration tests
-- **Git Hooks**: Husky for pre-commit checks
+## 5. Error Handling
 
-## 15. Deployment
+### 5.1 Custom Error Classes
 
-- **Environment**: Separate configs for dev/staging/prod
-- **CI/CD**: Automated testing and deployment
-- **Monitoring**: Error tracking and performance monitoring
-- **Backup**: Regular database backups
+```typescript
+export class UserNotFoundError extends Error {
+    constructor(userId: string) {
+        super(`User with ID ${userId} not found`);
+        this.name = 'UserNotFoundError';
+    }
+}
+
+export class AuthenticationError extends Error {
+    constructor(message: string = 'Authentication failed') {
+        super(message);
+        this.name = 'AuthenticationError';
+    }
+}
+```
+
+### 5.2 Error Naming
+
+- **Class Name**: `PascalCase` + `Error` suffix
+- **File Location**: `src/lib/errors/`
+- **TRPC Errors**: Use `TRPCError` from `@trpc/server`
+
+## 6. Environment Variables
+
+### 6.1 Naming Format
+
+- **Backend-specific**: `BE_` prefix + `SCREAMING_SNAKE_CASE`
+- **General**: `SCREAMING_SNAKE_CASE`
+
+### 6.2 Examples
+
+```bash
+# Backend specific
+BE_PORT=3000
+BE_HOST=0.0.0.0
+BE_NODE_ENV=development
+BE_LOG_LEVEL=debug
+
+# General
+MONGODB_URI=mongodb://localhost:27017/aloha
+JWT_SECRET=your-secret-key
+JWT_ISSUER=https://api.aloha.com
+JWT_AUDIENCE=aloha-api
+CORS_ORIGIN=https://app.aloha.com
+```
+
+## 7. Testing Conventions
+
+### 7.1 Test File Organization
+
+```
+tests/
+├── integration/
+│   ├── auth/
+│   │   └── login.test.ts
+│   └── users/
+│       └── profile.test.ts
+└── utils/
+    └── test-helpers.ts
+```
+
+### 7.2 Test Naming
+
+- **Files**: `{feature}.test.ts` or `{feature}.spec.ts`
+- **Test Cases**: `describe('Feature', () => { it('should do something', () => { ... }) })`
+- **Mock Data**: Use factories in `tests/utils/`
+
+## 8. Zod Validation Schemas
+
+### 8.1 Schema Naming
+
+- **Input Schemas**: `{Action}{Entity}Input` (e.g., `CreateUserInput`, `LoginInput`)
+- **Response Schemas**: `{Entity}Response` (e.g., `UserResponse`, `AuthResponse`)
+
+### 8.2 Schema Location
+
+- **Domain Schemas**: `src/resources/{domain}/{domain}.schemas.ts`
+- **Shared Schemas**: `src/lib/schemas/`
+
+## 9. Logging
+
+### 9.1 Logger Usage
+
+```typescript
+import { logger } from '../util/logger';
+
+// Info level
+logger.info('User logged in', { userId, email });
+
+// Error level
+logger.error('Login failed', { error: err.message, email });
+
+// Debug level
+logger.debug('JWT token generated', { userId, tokenExpiry });
+```
+
+### 9.2 Log Levels
+
+- **error**: Errors and exceptions
+- **warn**: Warnings
+- **info**: General information
+- **debug**: Debug information
+
+## 10. Import/Export Rules
+
+### 10.1 Import Order
+
+1. Node.js built-ins
+2. External packages
+3. Internal modules (lib, util)
+4. Relative imports
+
+### 10.2 Export Patterns
+
+```typescript
+// Named exports for utilities
+export { hashPassword, verifyPassword } from './auth';
+
+// Default export for main classes
+export default class UserService { ... }
+
+// Re-export for convenience
+export * from './types';
+```
+
+## 11. TypeScript Rules
+
+### 11.1 Strict Mode
+
+- Always use strict TypeScript settings
+- No `any` types (use `unknown` if necessary)
+- Explicit return types for functions
+- Use interfaces over types for object shapes
+
+### 11.2 Type Definitions
+
+```typescript
+// Good: Explicit interface
+interface User {
+    id: string;
+    email: string;
+    name: string;
+    role: UserRole;
+    createdAt: Date;
+}
+
+// Good: Union types for enums
+type UserRole = 'admin' | 'user' | 'moderator';
+
+// Good: Generic types
+type ApiResponse<T> = {
+    success: boolean;
+    data: T;
+    error?: string;
+};
+```
+
+## 12. Security Best Practices
+
+### 12.1 Password Handling
+
+- Use bcryptjs for hashing (minimum 12 rounds)
+- Never log passwords
+- Implement password strength validation
+
+### 12.2 JWT Tokens
+
+- Use secure secrets (minimum 256 bits)
+- Set appropriate expiration times
+- Implement token refresh mechanism
+- Validate tokens on each request
+
+### 12.3 Input Validation
+
+- Always validate input with Zod schemas
+- Sanitize user inputs
+- Use parameterized queries (Mongoose handles this)
+
+## 13. Performance Guidelines
+
+### 13.1 Database Queries
+
+- Use indexes for frequently queried fields
+- Implement pagination for list endpoints
+- Use lean() queries when possible in Mongoose
+- Avoid N+1 query problems
+
+### 13.2 Caching Strategy
+
+- Cache frequently accessed data
+- Use appropriate cache expiration
+- Invalidate cache on data changes
+
+## 14. Code Quality
+
+### 14.1 Linting and Formatting
+
+- Use ESLint with TypeScript rules
+- Use Prettier for code formatting
+- Run linters in CI/CD pipeline
+
+### 14.2 Documentation
+
+- JSDoc comments for public APIs
+- README files for complex modules
+- API documentation with examples
+
+### 14.3 Commit Messages
+
+- Use conventional commits format
+- English language
+- Descriptive but concise
+
+## 15. Development Workflow
+
+### 15.1 Branch Naming
+
+- `feature/{feature-name}` for new features
+- `fix/{issue-description}` for bug fixes
+- `refactor/{description}` for refactoring
+
+### 15.2 Pull Request Guidelines
+
+- Descriptive title and description
+- Reference related issues
+- Include tests for new features
+- Code review required before merge
 
 ---
 
-_This document should be updated as the project evolves. All team members and AI agents must adhere to these conventions._
+_These conventions ensure consistency, maintainability, and scalability across the Aloha Backend codebase. All team members should follow these guidelines._
