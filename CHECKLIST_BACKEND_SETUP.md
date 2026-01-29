@@ -1,6 +1,6 @@
-# Backend Setup Checklist
+# Backend Setup Checklist - FOCUS: Auth & User Management
 
-Dưới đây là checklist chuẩn quy trình để setup backend cho dự án Aloha, dựa trên kiến trúc đã định nghĩa (Fastify + tRPC + Zod + MongoDB).
+Dưới đây là checklist được ưu tiên cho việc setup authentication và user management trước, dựa trên kiến trúc tham khảo từ backend-summary.md (MongoDB + JWT + Zod + tRPC).
 
 ## 0. Setup Coding Conventions (Prerequisite)
 
@@ -36,99 +36,129 @@ Dưới đây là checklist chuẩn quy trình để setup backend cho dự án 
 - [ ] Thêm testing dependencies: jest, @types/jest, supertest, @types/supertest
 - [ ] Verify dependencies: Chạy `pnpm list` để kiểm tra
 
-## 3. Thiết lập Cấu trúc Thư mục (High Priority)
+## 3. Thiết lập Cấu trúc Thư mục - FOCUS Auth/User (High Priority)
 
-- [ ] Tạo thư mục `src/` với subfolders:
-    - `src/routes/` - tRPC routes
-    - `src/schemas/` - Zod validation schemas
-    - `src/models/` - MongoDB Mongoose models
-    - `src/services/` - Business logic services
-    - `src/utils/` - Utility functions
-    - `src/config/` - Configuration files
-- [ ] Tạo file entry point: `src/index.ts` hoặc `src/server.ts`
+- [ ] Tạo cấu trúc thư mục cơ bản:
+    ```
+    apps/backend/
+    ├── src/
+    │   ├── resources/                 # Business logic by domain
+    │   │   ├── auth/                  # 🔴 PRIORITY: Authentication
+    │   │   │   ├── auth.service.ts        # JWT logic, password hashing
+    │   │   │   ├── auth.procedures.ts     # login, register, logout
+    │   │   │   └── auth.router.ts         # Auth TRPC router
+    │   │   └── users/                 # 🔴 PRIORITY: User management
+    │   │       ├── users.service.ts       # User CRUD operations
+    │   │       ├── users.procedures.ts    # User API procedures
+    │   │       └── users.router.ts        # User TRPC router
+    │   ├── lib/                       # Infrastructure
+    │   │   ├── trpc/
+    │   │   │   ├── router.ts              # Main TRPC router assembly
+    │   │   │   ├── context.ts             # Request context
+    │   │   │   ├── middleware.ts          # 🔴 PRIORITY: Auth middleware
+    │   │   │   └── trpc.ts                # TRPC setup
+    │   │   ├── db/connection.ts           # 🔴 PRIORITY: MongoDB setup
+    │   │   ├── auth.ts                    # 🔴 PRIORITY: JWT utilities
+    │   │   └── errors/                    # 🔴 PRIORITY: Custom errors
+    │   ├── util/                      # Utilities
+    │   │   ├── env.ts                  # 🔴 PRIORITY: Environment helpers
+    │   │   └── logger.ts               # 🔴 PRIORITY: Logging utilities
+    │   └── server.ts                  # 🔴 PRIORITY: Server setup
+    ├── tests/                         # Test files (optional for now)
+    └── package.json
+    ```
+- [ ] Tạo file entry point: `src/server.ts`
 
-## 4. Cấu hình Database (Critical)
+## 4. Cấu hình Database - MongoDB (Critical)
 
-- [ ] Setup MongoDB connection trong `src/config/database.ts`
+- [ ] Setup MongoDB connection trong `src/lib/db/connection.ts`
 - [ ] Tạo environment variables: `.env` với MONGODB_URI
 - [ ] Tạo `.env.example` với template environment variables
 - [ ] Tạo connection utility và error handling
 - [ ] Test database connection
 
-## 5. Thiết lập tRPC và Fastify (High Priority)
+## 5. Thiết lập tRPC và Fastify - Core Setup (High Priority)
 
-- [ ] Khởi tạo tRPC app router trong `src/routes/appRouter.ts`
-- [ ] Tạo Fastify server với tRPC adapter
+- [ ] Khởi tạo tRPC setup trong `src/lib/trpc/trpc.ts`
+- [ ] Tạo context trong `src/lib/trpc/context.ts`
+- [ ] Setup middleware trong `src/lib/trpc/middleware.ts` (JWT auth)
+- [ ] Tạo main router trong `src/lib/trpc/router.ts`
+- [ ] Tạo Fastify server trong `src/server.ts` với tRPC adapter
 - [ ] Setup CORS, logging middleware
 - [ ] Tạo hello world route để test
 
-## 6. Tạo Zod Schemas và Models (High Priority)
+## 6. Tạo Auth Resource - CORE FEATURE (High Priority)
 
-- [ ] Định nghĩa Zod schemas cho User, Product, Category
-- [ ] Tạo Mongoose models tương ứng
-- [ ] Implement validation middleware
+- [ ] Tạo `src/resources/auth/` structure:
+    - `auth.service.ts` - JWT token generation, password hashing/verification
+    - `auth.procedures.ts` - login, register, logout, refresh token
+    - `auth.router.ts` - Auth TRPC router
+- [ ] Implement JWT utilities trong `src/lib/auth.ts`
+- [ ] Setup password hashing với bcryptjs
+- [ ] Create login/register procedures
 
-## 7. Implement Business Logic (Medium Priority)
+## 7. Tạo Users Resource - CORE FEATURE (High Priority)
 
-- [ ] Tạo domain entities (User, Product, Category)
-- [ ] Implement business services
-- [ ] Implement authentication logic (JWT)
-- [ ] Tạo utility functions cho password hashing, etc.
+- [ ] Tạo `src/resources/users/` structure:
+    - `users.service.ts` - User CRUD operations (MongoDB)
+    - `users.procedures.ts` - getProfile, updateProfile, etc.
+    - `users.router.ts` - User TRPC router
+- [ ] Tạo Mongoose User model
+- [ ] Implement user business logic
+- [ ] Create protected user procedures
 
-## 8. Setup Authentication (Medium Priority)
+## 8. Setup Authentication Middleware - CORE FEATURE (High Priority)
 
-- [ ] Implement JWT authentication middleware
-- [ ] Tạo login/register use cases
-- [ ] Setup session management
-- [ ] Create protected tRPC procedures
+- [ ] Implement JWT authentication middleware trong `src/lib/trpc/middleware.ts`
+- [ ] Protect user procedures với auth middleware
+- [ ] Setup token validation và user context
+- [ ] Handle token refresh logic
 
-## 9. Error Handling & Logging (Medium Priority)
+## 9. Error Handling & Logging - Essential (Medium Priority)
 
-- [ ] Create custom error classes
+- [ ] Create custom error classes trong `src/lib/errors/`
 - [ ] Implement global error handler for Fastify
-- [ ] Setup structured logging với Pino
+- [ ] Setup structured logging với Pino trong `src/util/logger.ts`
 - [ ] Add error tracking và monitoring
 
-## 10. Testing và Validation (Medium Priority)
+## 10. Testing Auth/User - Minimal (Medium Priority)
 
-- [ ] Viết unit tests cho entities và services
-- [ ] Viết integration tests cho repositories
-- [ ] Viết API tests cho tRPC routes
+- [ ] Viết basic integration tests cho auth: `tests/integration/auth/`
+- [ ] Viết basic integration tests cho users: `tests/integration/users/`
 - [ ] Setup test database (MongoDB Memory Server)
-- [ ] Implement test utilities và factories
+- [ ] Test login/register flow end-to-end
 
-## 11. Security & Performance (Medium Priority)
+## 11. Security & Validation - Important (Medium Priority)
 
-- [ ] Implement input sanitization and validation
-- [ ] Add security headers and CORS configuration
-- [ ] Setup rate limiting per user/route
-- [ ] Implement caching layer (Redis)
-- [ ] Add database indexes and query optimization
+- [ ] Implement input validation với Zod schemas
+- [ ] Add security headers và CORS configuration
+- [ ] Setup basic rate limiting
+- [ ] Password strength validation
 
-## 12. Scripts và Deployment (Low Priority)
+## 12. Products & Categories - LATER (Low Priority)
 
-- [ ] Thêm scripts trong `package.json`: dev, build, start, test
-- [ ] Setup production build với TypeScript compilation
-- [ ] Tạo Dockerfile cho containerization
-- [ ] Cấu hình environment cho production (staging, prod)
-- [ ] Setup health checks và monitoring
-- [ ] Implement graceful shutdown
+- [ ] Tạo `src/resources/products/` structure
+- [ ] Tạo `src/resources/categories/` structure
+- [ ] Implement product/category business logic
+- [ ] Add product/category procedures
 
-## 13. Documentation và Final Checks (Low Priority)
+## 13. Advanced Features - FUTURE (Low Priority)
 
-- [ ] Cập nhật docs trong `docs/architecture/backend.md`
-- [ ] Tạo API documentation với Swagger/OpenAPI từ tRPC
-- [ ] Document domain entities và business rules
-- [ ] Final security audit: `pnpm audit`
-- [ ] Performance testing và optimization
-- [ ] Setup CI/CD pipeline với automated testing
+- [ ] Email utilities (`src/lib/mail/`)
+- [ ] Background jobs (`src/jobs/`)
+- [ ] Internationalization (`src/lib/i18n/`)
+- [ ] Caching layer (Redis)
+- [ ] Advanced testing suite
+- [ ] Docker containerization
+- [ ] CI/CD pipeline
 
 ## Notes
 
-- Thực hiện theo thứ tự ưu tiên: Critical > High > Medium > Low
-- Test từng bước để đảm bảo stability
+- 🔴 **PRIORITY FOCUS**: Auth & User management (login, register, JWT tokens)
+- Test từng bước để đảm bảo login/register hoạt động
+- Sau khi auth/user ổn định, mới mở rộng sang products/categories
 - Sử dụng TypeScript strictly để type safety
 - Đảm bảo compatibility với frontend (tRPC types)
-- Tuân thủ Modular Clean Architecture principles
-- Implement comprehensive error handling
-- Focus on testability và maintainability
+- Tuân thủ Resource-Oriented Architecture pattern
+- Implement comprehensive error handling cho auth flows
+- Focus on security: password hashing, JWT validation, input sanitization
