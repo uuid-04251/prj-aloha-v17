@@ -79,6 +79,62 @@ This project uses GitHub Actions for continuous integration:
 pnpm test:ci
 ```
 
+## 📝 Commit Convention
+
+This project uses [Conventional Commits](https://conventionalcommits.org/) to ensure consistent commit messages and automated changelog generation.
+
+### Commit Message Format:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Types:
+
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code (white-space, formatting, etc.)
+- `refactor`: A code change that neither fixes a bug nor adds a feature
+- `perf`: A code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `build`: Changes that affect the build system or external dependencies
+- `ci`: Changes to our CI configuration files and scripts
+- `chore`: Other changes that don't modify src or test files
+
+### Examples:
+
+```bash
+feat: add user authentication
+fix: resolve memory leak in dashboard
+docs: update API documentation
+style: format code with prettier
+refactor: simplify component logic
+perf: optimize database queries
+test: add unit tests for user service
+build: update dependencies
+ci: add github actions workflow
+chore: update package.json
+```
+
+### Breaking Changes:
+
+For breaking changes, add `!` after the type/scope and explain in the footer:
+
+```bash
+feat!: change API response format
+
+BREAKING CHANGE: The response now includes additional metadata
+```
+
+### Commit Validation:
+
+Commits are automatically validated using [commitlint](https://commitlint.js.org/) via git hooks. Invalid commit messages will be rejected.
+
 ## 🏗️ Tech Stack
 
 - **Framework:** Next.js 16 (App Router)
@@ -89,6 +145,7 @@ pnpm test:ci
 - **Linting:** ESLint
 - **Formatting:** Prettier
 - **Git Hooks:** Husky
+- **Commit Convention:** commitlint with conventional commits
 
 ## 📁 Project Structure
 
