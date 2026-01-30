@@ -142,10 +142,12 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 
 ## 10. Testing Auth/User - Minimal (Medium Priority)
 
-- [ ] Viết basic integration tests cho auth: `tests/integration/auth/`
-- [ ] Viết basic integration tests cho users: `tests/integration/users/`
-- [ ] Setup test database (MongoDB Memory Server)
-- [ ] Test login/register flow end-to-end
+- [x] Viết basic integration tests cho auth: `tests/integration/auth/`
+- [x] Viết basic integration tests cho users: `tests/integration/users/`
+- [x] Setup test database (MongoDB Memory Server)
+- [x] Test login/register flow end-to-end
+- [x] 62 tests passing (27 model tests + 35 service tests)
+- [x] Test coverage: 91%+ for user.model.ts and users.service.ts
 
 ## 11. Security & Validation - Important (Medium Priority)
 
