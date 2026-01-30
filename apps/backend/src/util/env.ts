@@ -18,6 +18,13 @@ const envSchema = z.object({
     // Database
     MONGODB_URI: z.string().default('mongodb://localhost:27017/aloha'),
 
+    // Redis
+    REDIS_HOST: z.string().default('localhost'),
+    REDIS_PORT: z.coerce.number().default(6379),
+    REDIS_PASSWORD: z.string().optional(),
+    REDIS_DB: z.coerce.number().default(0),
+    REDIS_ENABLED: z.coerce.boolean().default(true),
+
     // JWT
     JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
     JWT_ISSUER: z.string().default('https://api.aloha.com'),

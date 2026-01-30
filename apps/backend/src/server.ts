@@ -7,6 +7,7 @@ import { createContext } from './lib/trpc/context';
 import { logger } from './util/logger';
 import { env } from './util/env';
 import { connectToDatabase } from './lib/db/connection';
+import { getRedisClient, closeRedisConnection, isRedisConnected } from './lib/redis';
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -41,7 +42,11 @@ async function registerPlugins() {
 
 // Health check endpoint
 server.get('/health', async () => {
-    return { status: 'ok', timestamp: new Date().toISOString() };
+    return {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        redis: isRedisConnected() ? 'connected' : 'disconnected'
+    };
 });
 
 // Start server
@@ -49,6 +54,9 @@ async function start() {
     try {
         // Connect to database first
         await connectToDatabase();
+
+        // Initialize Redis connection
+        getRedisClient();
 
         await registerPlugins();
 
@@ -67,11 +75,13 @@ async function start() {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
     logger.info('SIGTERM received, shutting down gracefully');
+    await closeRedisConnection();
     await server.close();
 });
 
 process.on('SIGINT', async () => {
     logger.info('SIGINT received, shutting down gracefully');
+    await closeRedisConnection();
     await server.close();
 });
 
