@@ -99,13 +99,14 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 
 ## 7. Tạo Users Resource - CORE FEATURE (High Priority)
 
-- [ ] Tạo `src/resources/users/` structure:
+- [x] Tạo `src/resources/users/` structure:
     - `users.service.ts` - User CRUD operations (MongoDB)
-    - `users.procedures.ts` - getProfile, updateProfile, etc.
+    - `users.procedures.ts` - getUsers, getUserById, createUser, updateProfile, deleteUser
     - `users.router.ts` - User TRPC router
-- [ ] Tạo Mongoose User model
-- [ ] Implement user business logic
-- [ ] Create protected user procedures
+    - `users.schemas.ts` - Zod validation schemas
+- [x] Tạo Mongoose User model
+- [x] Implement user business logic
+- [x] Create protected user procedures
 
 ## 8. Setup Authentication Middleware - CORE FEATURE (High Priority)
 
