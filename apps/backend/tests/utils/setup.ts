@@ -1,5 +1,6 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { closeRedisConnection } from '@/lib/redis/connection';
 
 let mongoServer: MongoMemoryServer;
 
@@ -34,4 +35,7 @@ afterAll(async () => {
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
     await mongoServer.stop();
+
+    // Close Redis connection to prevent handle leaks
+    await closeRedisConnection();
 });

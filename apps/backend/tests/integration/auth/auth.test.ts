@@ -2,35 +2,15 @@ import { generateAccessToken, verifyToken } from '@/lib/auth';
 import { Token } from '@/lib/db/models/token.model';
 import { User } from '@/lib/db/models/user.model';
 import { AuthService } from '@/resources/auth/auth.service';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose from 'mongoose';
 
 describe('Auth Integration Tests', () => {
-    let mongoServer: MongoMemoryServer;
     let authService: AuthService;
 
     beforeAll(async () => {
-        // Disconnect existing mongoose connection if any
-        if (mongoose.connection.readyState !== 0) {
-            await mongoose.disconnect();
-        }
-
-        mongoServer = await MongoMemoryServer.create();
-        const mongoUri = mongoServer.getUri();
-        await mongoose.connect(mongoUri);
         authService = new AuthService();
     });
 
-    afterAll(async () => {
-        await mongoose.connection.dropDatabase();
-        await mongoose.disconnect();
-        await mongoServer.stop();
-    });
-
-    afterEach(async () => {
-        await User.deleteMany({});
-        await Token.deleteMany({});
-    });
+    // Data cleanup is handled by global setup
 
     describe('register', () => {
         it('should register a new user successfully', async () => {
