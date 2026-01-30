@@ -184,25 +184,65 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 - [ ] Add database migrations/scripts
 - [ ] Setup database seeding cho development
 
-## 16. Advanced Features - FUTURE (Low Priority)
+## 17. Immediate Optimizations - CRITICAL FIXES (High Priority)
 
-- [ ] Email utilities (`src/lib/mail/`)
-- [ ] Background jobs (`src/jobs/`)
-- [ ] Internationalization (`src/lib/i18n/`)
-- [ ] Caching layer (Redis)
-- [ ] Advanced testing suite
+- [ ] **Fix Duplicate Database Indexes** (Critical)
+    - Resolve Mongoose warnings: "Duplicate schema index on {"email":1}" and {"token":1}"
+    - Remove duplicate index definitions in user.model.ts and token.model.ts
+    - Test index performance after fix
+
+- [ ] **Implement Authentication Middleware** (High Priority)
+    - Replace all `publicProcedure` with `protectedProcedure` for user operations
+    - Add user ownership validation (users can only update their own profile)
+    - Implement proper JWT token validation in middleware
+    - Add role-based access control (admin vs user permissions)
+
+- [ ] **Security Enhancements** (High Priority)
+    - Add rate limiting for user operations (login, register, profile updates)
+    - Implement input sanitization middleware
+    - Add security headers (helmet) configuration
+    - Setup CORS properly for production domains
+
+- [ ] **Complete User Management Features** (Medium Priority)
+    - Add pagination metadata (totalCount, hasNextPage) for getUsers
+    - Implement email verification workflow
+    - Add password reset/change functionality
+    - Create audit trail for user updates
+    - Add user profile image upload
+
+- [ ] **Performance Optimizations** (Medium Priority)
+    - Implement Redis caching for frequent user queries
+    - Add database query optimization (lean queries, proper indexes)
+    - Setup response compression
+    - Add request/response logging
+
+- [ ] **Error Handling & Monitoring** (Medium Priority)
+    - Implement global error handler for Fastify
+    - Setup structured logging with Pino
+    - Add error tracking and monitoring (prom-client metrics)
+    - Complete all TODO comments in procedures
+
+- [ ] **Testing Enhancements** (Medium Priority)
+    - Add authentication tests (login/register flows)
+    - Test edge cases and validation errors
+    - Add performance/load testing
+    - Increase test coverage to 95%+
+
+## 18. Production Readiness Checklist (Future)
+
+- [ ] Environment validation with convict
 - [ ] Docker containerization
-- [ ] CI/CD pipeline
+- [ ] CI/CD pipeline setup
+- [ ] Database migrations
+- [ ] Backup strategies
+- [ ] Monitoring and alerting
+- [ ] SSL/TLS configuration
 
-## Notes
+## Updated Notes
 
-- 🔴 **PRIORITY FOCUS**: Auth & User management (login, register, JWT tokens)
-- ✅ **COMPLETED**: Authentication middleware, Users resource, Auth database integration, Token blacklist
-- ⏭️ **NEXT STEPS**: Error handling, testing, security enhancements, API documentation
-- Auth system now fully functional with database integration
-- Token blacklist prevents token reuse after logout
-- Sử dụng TypeScript strictly để type safety
-- Đảm bảo compatibility với frontend (tRPC types)
-- Tuân thủ Resource-Oriented Architecture pattern
-- Implement comprehensive error handling cho auth flows
-- Focus on security: password hashing, JWT validation, input sanitization
+- 🔴 **CRITICAL**: Fix duplicate indexes immediately (affects performance)
+- 🔴 **HIGH PRIORITY**: Implement auth middleware and security before production
+- ✅ **COMPLETED**: Core auth/user functionality with clean architecture
+- ⏭️ **NEXT STEPS**: Security fixes, then performance optimizations
+- Module follows clean architecture but needs security hardening
+- Focus on security-first approach for production deployment

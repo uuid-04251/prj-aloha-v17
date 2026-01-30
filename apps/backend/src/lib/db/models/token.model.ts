@@ -40,6 +40,5 @@ tokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Index for faster lookups
 tokenSchema.index({ userId: 1, type: 1 });
-tokenSchema.index({ token: 1 });
 
 export const Token = mongoose.model<IToken>('Token', tokenSchema);
