@@ -40,12 +40,22 @@ export const authProcedures = {
     }),
 
     // Logout procedure (requires authentication)
-    // TODO: Replace with protectedProcedure once auth middleware is fully implemented
-    logout: publicProcedure.mutation(async ({ ctx }: { ctx: any }) => {
-        // TODO: Get userId from authenticated context
-        const userId = ctx.user?.userId || 'user-123'; // Mock for now
-        const accessToken = ctx.token;
+    logout: publicProcedure.mutation(async ({ ctx }) => {
+        const authHeader = (ctx as any).req.headers.authorization;
+        const token = authHeader?.substring(7); // Remove 'Bearer '
 
-        return authService.logout(userId, accessToken);
+        // For logout, we try to extract userId from token if valid
+        // If token is invalid/expired, we just skip blacklisting
+        if (token) {
+            try {
+                const { verifyToken } = await import('../../lib/auth');
+                const payload = verifyToken(token);
+                await authService.logout(payload.userId, token);
+            } catch {
+                // Token invalid/expired - just return success
+            }
+        }
+
+        return { success: true };
     })
 };

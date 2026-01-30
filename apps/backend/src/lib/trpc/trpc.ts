@@ -22,3 +22,6 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 export const middleware = t.middleware;
 export const createCallerFactory = t.createCallerFactory;
+
+// Export auth procedures from middleware
+export { protectedProcedure, adminProcedure } from './middleware';

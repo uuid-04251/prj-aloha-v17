@@ -1,4 +1,4 @@
-import { publicProcedure } from '@/lib/trpc/trpc';
+import { publicProcedure, protectedProcedure, adminProcedure } from '@/lib/trpc/trpc';
 import { TRPCError } from '@trpc/server';
 import { sanitizeUserResponse, sanitizeUsersResponse } from './users.helpers';
 import { createUserSchema, deleteUserInputSchema, deleteUserOutputSchema, getUserByIdInputSchema, getUsersOutputSchema, getUsersSchema, updateProfileInputSchema, userResponseSchema } from './users.schemas';
@@ -6,10 +6,9 @@ import { UserService } from './users.service';
 
 /**
  * Get paginated list of users (without passwords)
- * TODO: Add admin role check when auth middleware is implemented
- * TODO: Add pagination metadata (total count, hasNextPage, etc.)
+ * Requires authentication
  */
-export const getUsers = publicProcedure
+export const getUsers = protectedProcedure
     .input(getUsersSchema)
     .output(getUsersOutputSchema)
     .query(async ({ input }) => {
@@ -19,9 +18,9 @@ export const getUsers = publicProcedure
 
 /**
  * Delete a user by ID
- * TODO: Add admin role check or self-deletion check
+ * Requires admin role
  */
-export const deleteUser = publicProcedure
+export const deleteUser = adminProcedure
     .input(deleteUserInputSchema)
     .output(deleteUserOutputSchema)
     .mutation(async ({ input }) => {
@@ -68,13 +67,23 @@ export const createUser = publicProcedure
 
 /**
  * Update user profile
- * TODO: Add user ownership validation (user can only update their own profile)
+ * Users can only update their own profile unless they are admin
  */
-export const updateProfile = publicProcedure
+export const updateProfile = protectedProcedure
     .input(updateProfileInputSchema)
     .output(userResponseSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
         const { userId, ...updateData } = input;
+        const authUser = (ctx as any).user;
+
+        // Check ownership: user can only update their own profile unless admin
+        if (authUser.userId !== userId && authUser.role !== 'admin') {
+            throw new TRPCError({
+                code: 'FORBIDDEN',
+                message: 'You can only update your own profile'
+            });
+        }
+
         const user = await UserService.updateUser(userId, updateData);
 
         if (!user) {

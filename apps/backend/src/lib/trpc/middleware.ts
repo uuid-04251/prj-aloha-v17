@@ -52,25 +52,23 @@ export const authMiddleware = middleware(async ({ ctx, next }) => {
 });
 
 // Protected procedure - requires authentication
-export const protectedProcedure = authMiddleware.unstable_pipe;
+export const protectedProcedure = publicProcedure.use(authMiddleware);
 
 // Admin middleware - requires admin role
-export const adminMiddleware = authMiddleware.unstable_pipe(
-    middleware(async ({ ctx, next }) => {
-        const authCtx = ctx as Context & { user: JWTPayload };
-        if (authCtx.user?.role !== 'admin') {
-            throw new TRPCError({
-                code: 'FORBIDDEN',
-                message: 'Admin access required'
-            });
-        }
+export const adminMiddleware = middleware(async ({ ctx, next }) => {
+    const authCtx = ctx as Context & { user: JWTPayload };
+    if (authCtx.user?.role !== 'admin') {
+        throw new TRPCError({
+            code: 'FORBIDDEN',
+            message: 'Admin access required'
+        });
+    }
 
-        return next();
-    })
-);
+    return next();
+});
 
 // Admin procedure - requires admin role
-export const adminProcedure = adminMiddleware.unstable_pipe;
+export const adminProcedure = protectedProcedure.use(adminMiddleware);
 
 // Type-safe context with user
 export type AuthContext = Context & {
