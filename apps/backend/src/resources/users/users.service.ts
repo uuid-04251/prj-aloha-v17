@@ -1,96 +1,194 @@
-import { z } from 'zod';
 import User, { IUser } from '@/lib/db/models/user.model';
-
-export interface CreateUserData {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    role?: 'user' | 'admin';
-}
-
-/** @typedef {UpdateUserData} - Interface for updating user data */
-export interface UpdateUserData {
-    firstName?: string | undefined;
-    lastName?: string | undefined;
-    email?: string | undefined;
-    role?: 'user' | 'admin' | undefined;
-}
+import { isValidObjectId } from '@/lib/helpers/validation';
+import { TRPCError } from '@trpc/server';
+import { ICreateUserData, IUpdateUserData } from './users.types';
 
 export class UserService {
-    // TODO: Add input validation using Zod schemas for better type safety
-    // TODO: Implement proper error handling with custom error classes
-    // TODO: Add caching layer for frequently accessed users
-    // TODO: Consider adding soft delete functionality instead of hard delete
-    static async createUser(data: CreateUserData): Promise<IUser> {
-        try {
-            const existingUser = await User.findOne({ email: data.email });
-            if (existingUser) {
-                throw new Error('User with this email already exists');
-            }
+    /**
+     * Create a new user
+     * @throws {TRPCError} BAD_REQUEST if email already exists
+     * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
+     */
+    static async createUser(data: ICreateUserData): Promise<IUser> {
+        const existingUser = await User.findOne({ email: data.email.toLowerCase() });
+        if (existingUser) {
+            throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'User with this email already exists'
+            });
+        }
 
+        try {
             const user = new User(data);
             await user.save();
             return user;
         } catch (error) {
-            throw new Error(`Failed to create user: ${(error as Error).message}`);
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Failed to create user',
+                cause: error
+            });
         }
     }
 
+    /**
+     * Get user by ID
+     * @throws {TRPCError} BAD_REQUEST if ID is invalid
+     * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
+     */
     static async getUserById(id: string): Promise<IUser | null> {
+        if (!isValidObjectId(id)) {
+            throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Invalid user ID format'
+            });
+        }
+
         try {
             return await User.findById(id);
         } catch (error) {
-            throw new Error(`Failed to get user: ${(error as Error).message}`);
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Failed to get user',
+                cause: error
+            });
         }
     }
 
+    /**
+     * Get user by email
+     * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
+     */
     static async getUserByEmail(email: string): Promise<IUser | null> {
         try {
             return await User.findOne({ email: email.toLowerCase() });
         } catch (error) {
-            throw new Error(`Failed to get user by email: ${(error as Error).message}`);
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Failed to get user by email',
+                cause: error
+            });
         }
     }
 
-    static async updateUser(id: string, data: UpdateUserData): Promise<IUser | null> {
-        try {
-            // Filter out undefined values
-            const updateData = Object.fromEntries(Object.entries(data).filter(([_, value]) => value !== undefined));
+    /**
+     * Update user information
+     * @throws {TRPCError} BAD_REQUEST if ID is invalid or email already exists
+     * @throws {TRPCError} NOT_FOUND if user doesn't exist
+     * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
+     */
+    static async updateUser(id: string, data: IUpdateUserData): Promise<IUser | null> {
+        if (!isValidObjectId(id)) {
+            throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Invalid user ID format'
+            });
+        }
 
-            const user = await User.findByIdAndUpdate(id, { ...updateData, updatedAt: new Date() }, { new: true, runValidators: true });
-            if (!user) {
-                throw new Error('User not found');
+        // Filter out undefined values and remove password field for security
+        const updateData = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== undefined && key !== 'password'));
+
+        if (Object.keys(updateData).length === 0) {
+            // Nothing to update, return current user
+            return this.getUserById(id);
+        }
+
+        // Check email uniqueness if email is being updated
+        if (updateData.email) {
+            const existingUser = await User.findOne({
+                email: updateData.email.toLowerCase(),
+                _id: { $ne: id }
+            });
+            if (existingUser) {
+                throw new TRPCError({
+                    code: 'BAD_REQUEST',
+                    message: 'Email already in use by another user'
+                });
             }
+        }
+
+        try {
+            const user = await User.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+
+            if (!user) {
+                throw new TRPCError({
+                    code: 'NOT_FOUND',
+                    message: 'User not found'
+                });
+            }
+
             return user;
         } catch (error) {
-            throw new Error(`Failed to update user: ${(error as Error).message}`);
+            if (error instanceof TRPCError) {
+                throw error;
+            }
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Failed to update user',
+                cause: error
+            });
         }
     }
 
+    /**
+     * Delete user by ID
+     * @throws {TRPCError} BAD_REQUEST if ID is invalid
+     * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
+     */
     static async deleteUser(id: string): Promise<boolean> {
+        if (!isValidObjectId(id)) {
+            throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Invalid user ID format'
+            });
+        }
+
         try {
             const result = await User.findByIdAndDelete(id);
             return !!result;
         } catch (error) {
-            throw new Error(`Failed to delete user: ${(error as Error).message}`);
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Failed to delete user',
+                cause: error
+            });
         }
     }
 
+    /**
+     * Get paginated list of users
+     * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
+     */
     static async getUsers(limit: number = 10, offset: number = 0): Promise<IUser[]> {
         try {
-            return await User.find().sort({ createdAt: -1 }).limit(limit).skip(offset);
+            return await User.find()
+                .select('-password -__v') // Exclude password and version key for security
+                .sort({ createdAt: -1 })
+                .limit(limit)
+                .skip(offset)
+                .lean(false); // Return Mongoose documents for method access
         } catch (error) {
-            throw new Error(`Failed to get users: ${(error as Error).message}`);
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Failed to get users',
+                cause: error
+            });
         }
     }
 
+    /**
+     * Get total count of users
+     * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
+     */
     static async getUserCount(): Promise<number> {
-        // TODO: Remove this method if not needed, or implement in router if pagination requires total count
         try {
             return await User.countDocuments();
         } catch (error) {
-            throw new Error(`Failed to get user count: ${(error as Error).message}`);
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Failed to get user count',
+                cause: error
+            });
         }
     }
 }
