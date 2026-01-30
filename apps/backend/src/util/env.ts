@@ -4,9 +4,6 @@ import { z } from 'zod';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// Debug: print JWT_SECRET
-console.log('JWT_SECRET from process.env:', process.env.JWT_SECRET);
-
 // Environment variables schema
 const envSchema = z.object({
     // Backend specific
@@ -15,8 +12,8 @@ const envSchema = z.object({
     BE_NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     BE_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 
-    // Database
-    MONGODB_URI: z.string().default('mongodb://localhost:27017/aloha'),
+    // Database - REQUIRED
+    MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
 
     // Redis
     REDIS_HOST: z.string().default('localhost'),
@@ -25,7 +22,7 @@ const envSchema = z.object({
     REDIS_DB: z.coerce.number().default(0),
     REDIS_ENABLED: z.coerce.boolean().default(true),
 
-    // JWT
+    // JWT - REQUIRED
     JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
     JWT_ISSUER: z.string().default('https://api.aloha.com'),
     JWT_AUDIENCE: z.string().default('aloha-api'),
@@ -40,8 +37,31 @@ const envSchema = z.object({
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-    console.error('❌ Invalid environment variables:');
-    console.error(parsedEnv.error.format());
+    console.error('❌ Environment variable validation failed:');
+    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    const errors = parsedEnv.error.format();
+
+    // Log each error with clear formatting
+    Object.entries(errors).forEach(([key, error]) => {
+        if (key !== '_errors' && error) {
+            const errorMessages = (error as any)._errors || [];
+            if (errorMessages.length > 0) {
+                console.error(`\n❌ ${key}:`);
+                errorMessages.forEach((msg: string) => {
+                    console.error(`   → ${msg}`);
+                });
+            }
+        }
+    });
+
+    console.error('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error('\n📝 Required environment variables:');
+    console.error('   • MONGODB_URI - Database connection string');
+    console.error('   • JWT_SECRET - Secret key for JWT (minimum 32 characters)');
+    console.error('\n💡 Check .env.example for reference');
+    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
     process.exit(1);
 }
 
