@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { middleware, publicProcedure } from './trpc';
 import { extractTokenFromHeader, verifyToken, type JWTPayload } from '../auth';
 import type { Context } from './context';
+import { authService } from '../../resources/auth/auth.service';
 
 // Auth middleware - requires valid JWT token
 export const authMiddleware = middleware(async ({ ctx, next }) => {
@@ -25,12 +26,22 @@ export const authMiddleware = middleware(async ({ ctx, next }) => {
     try {
         const payload = verifyToken(token);
 
-        // Add user to context
+        // Check if token is blacklisted
+        const isBlacklisted = await authService.isTokenBlacklisted(token);
+        if (isBlacklisted) {
+            throw new TRPCError({
+                code: 'UNAUTHORIZED',
+                message: 'Token has been revoked'
+            });
+        }
+
+        // Add user and token to context
         return next({
             ctx: {
                 ...ctx,
-                user: payload
-            } as Context & { user: JWTPayload }
+                user: payload,
+                token: token // Store token for logout
+            } as Context & { user: JWTPayload; token: string }
         });
     } catch (error) {
         throw new TRPCError({

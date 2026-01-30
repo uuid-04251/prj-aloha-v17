@@ -1,4 +1,4 @@
-# Backend Setup Checklist - FOCUS: Auth & User Management
+# Backend Setup Checklist - FOCUS: Core Auth & User Management
 
 Dưới đây là checklist được ưu tiên cho việc setup authentication và user management trước, dựa trên kiến trúc tham khảo từ backend-summary.md (MongoDB + JWT + Zod + tRPC).
 
@@ -22,6 +22,15 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
     - pino (logging)
     - @fastify/cors
     - @fastify/rate-limit
+    - @fastify/helmet (security headers)
+    - @fastify/swagger (API documentation)
+    - @fastify/swagger-ui (API documentation UI)
+    - @fastify/compress (response compression)
+    - @fastify/multipart (file uploads)
+    - mongoose-paginate-v2 (pagination)
+    - prom-client (metrics/monitoring)
+    - convict (environment validation)
+    - ioredis (Redis client for caching)
     - @types/node
     - @types/jsonwebtoken
     - @types/bcryptjs
@@ -47,17 +56,21 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
     │   │   │   ├── auth.service.ts        # JWT logic, password hashing
     │   │   │   ├── auth.procedures.ts     # login, register, logout
     │   │   │   └── auth.router.ts         # Auth TRPC router
-    │   │   └── users/                 # 🔴 PRIORITY: User management
-    │   │       ├── users.service.ts       # User CRUD operations
-    │   │       ├── users.procedures.ts    # User API procedures
-    │   │       └── users.router.ts        # User TRPC router
+    │   │   ├── users/                 # 🔴 PRIORITY: User management
+    │   │   │   ├── users.service.ts       # User CRUD operations
+    │   │   │   ├── users.procedures.ts    # User API procedures
+    │   │   │   ├── users.router.ts        # User TRPC router
+    │   │   │   └── users.schemas.ts       # Zod validation schemas
     │   ├── lib/                       # Infrastructure
     │   │   ├── trpc/
     │   │   │   ├── router.ts              # Main TRPC router assembly
     │   │   │   ├── context.ts             # Request context
     │   │   │   ├── middleware.ts          # 🔴 PRIORITY: Auth middleware
     │   │   │   └── trpc.ts                # TRPC setup
-    │   │   ├── db/connection.ts           # 🔴 PRIORITY: MongoDB setup
+    │   │   ├── db/
+    │   │   │   ├── connection.ts          # 🔴 PRIORITY: MongoDB setup
+    │   │   │   └── models/                # Mongoose models
+    │   │   │       └── user.model.ts
     │   │   ├── auth.ts                    # 🔴 PRIORITY: JWT utilities
     │   │   └── errors/                    # 🔴 PRIORITY: Custom errors
     │   ├── util/                      # Utilities
@@ -96,6 +109,9 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 - [x] Implement JWT utilities trong `src/lib/auth.ts`
 - [x] Setup password hashing với bcryptjs
 - [x] Create login/register procedures
+- [x] Integrate với User model (database queries)
+- [x] Implement token blacklist mechanism
+- [x] Add token validation trong middleware
 
 ## 7. Tạo Users Resource - CORE FEATURE (High Priority)
 
@@ -110,10 +126,12 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 
 ## 8. Setup Authentication Middleware - CORE FEATURE (High Priority)
 
-- [ ] Implement JWT authentication middleware trong `src/lib/trpc/middleware.ts`
-- [ ] Protect user procedures với auth middleware
-- [ ] Setup token validation và user context
-- [ ] Handle token refresh logic
+- [x] Implement JWT authentication middleware trong `src/lib/trpc/middleware.ts`
+- [x] Protect user procedures với auth middleware
+- [x] Setup token validation và user context
+- [x] Handle token refresh logic
+- [x] Implement token blacklist checking
+- [x] Store token in context for logout
 
 ## 9. Error Handling & Logging - Essential (Medium Priority)
 
@@ -136,14 +154,35 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 - [ ] Setup basic rate limiting
 - [ ] Password strength validation
 
-## 12. Products & Categories - LATER (Low Priority)
+## 12. API Documentation - Medium Priority
 
-- [ ] Tạo `src/resources/products/` structure
-- [ ] Tạo `src/resources/categories/` structure
-- [ ] Implement product/category business logic
-- [ ] Add product/category procedures
+- [ ] Setup Swagger documentation với @fastify/swagger
+- [ ] Configure Swagger UI với @fastify/swagger-ui
+- [ ] Generate OpenAPI spec từ tRPC routes
+- [ ] Add API documentation cho tất cả endpoints
 
-## 13. Advanced Features - FUTURE (Low Priority)
+## 13. File Upload Management - Medium Priority
+
+- [ ] Setup file upload với @fastify/multipart
+- [ ] Implement file validation (size, type, etc.)
+- [ ] Configure file storage (local/cloud)
+- [ ] Add file upload endpoints cho user avatars, etc.
+
+## 14. Caching & Performance - Medium Priority
+
+- [ ] Setup Redis connection với ioredis
+- [ ] Implement caching cho user queries
+- [ ] Add session storage
+- [ ] Setup cache invalidation strategies
+
+## 15. Database Enhancements - Medium Priority
+
+- [ ] Add mongoose-paginate-v2 cho pagination
+- [ ] Implement database indexes
+- [ ] Add database migrations/scripts
+- [ ] Setup database seeding cho development
+
+## 16. Advanced Features - FUTURE (Low Priority)
 
 - [ ] Email utilities (`src/lib/mail/`)
 - [ ] Background jobs (`src/jobs/`)
@@ -156,8 +195,10 @@ Dưới đây là checklist được ưu tiên cho việc setup authentication v
 ## Notes
 
 - 🔴 **PRIORITY FOCUS**: Auth & User management (login, register, JWT tokens)
-- Test từng bước để đảm bảo login/register hoạt động
-- Sau khi auth/user ổn định, mới mở rộng sang products/categories
+- ✅ **COMPLETED**: Authentication middleware, Users resource, Auth database integration, Token blacklist
+- ⏭️ **NEXT STEPS**: Error handling, testing, security enhancements, API documentation
+- Auth system now fully functional with database integration
+- Token blacklist prevents token reuse after logout
 - Sử dụng TypeScript strictly để type safety
 - Đảm bảo compatibility với frontend (tRPC types)
 - Tuân thủ Resource-Oriented Architecture pattern

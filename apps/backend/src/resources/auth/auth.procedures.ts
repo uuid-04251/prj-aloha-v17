@@ -10,7 +10,9 @@ const loginSchema = z.object({
 
 const registerSchema = z.object({
     email: z.string().email('Invalid email format'),
-    password: z.string().min(6, 'Password must be at least 6 characters')
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    firstName: z.string().min(1, 'First name is required').max(50, 'First name too long'),
+    lastName: z.string().min(1, 'Last name is required').max(50, 'Last name too long')
 });
 
 const refreshTokenSchema = z.object({
@@ -27,8 +29,8 @@ export const authProcedures = {
 
     // Register procedure
     register: publicProcedure.input(registerSchema).mutation(async ({ input }) => {
-        const { email, password } = input;
-        return authService.register(email, password);
+        const { email, password, firstName, lastName } = input;
+        return authService.register(email, password, firstName, lastName);
     }),
 
     // Refresh token procedure
@@ -38,9 +40,12 @@ export const authProcedures = {
     }),
 
     // Logout procedure (requires authentication)
-    logout: publicProcedure.mutation(async ({ ctx }) => {
+    // TODO: Replace with protectedProcedure once auth middleware is fully implemented
+    logout: publicProcedure.mutation(async ({ ctx }: { ctx: any }) => {
         // TODO: Get userId from authenticated context
-        const userId = 'user-123'; // Mock for now
-        return authService.logout(userId);
+        const userId = ctx.user?.userId || 'user-123'; // Mock for now
+        const accessToken = ctx.token;
+
+        return authService.logout(userId, accessToken);
     })
 };
