@@ -90,21 +90,6 @@ export class UserService {
      * Get user by email
      * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
      */
-    static async getUserByEmail(email: string): Promise<IUser | null> {
-        try {
-            return await User.findOne({ email: email.toLowerCase() });
-        } catch (error) {
-            throw createError(
-                ErrorCode.SYS_DATABASE_ERROR,
-                {
-                    operation: 'getUserByEmail',
-                    email: email.toLowerCase()
-                },
-                error as Error
-            );
-        }
-    }
-
     /**
      * Update user information
      * @throws {TRPCError} BAD_REQUEST if ID is invalid, email already exists, or invalid input
@@ -273,17 +258,4 @@ export class UserService {
      * Get total count of users
      * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
      */
-    static async getUserCount(): Promise<number> {
-        try {
-            return await User.countDocuments();
-        } catch (error) {
-            throw createError(
-                ErrorCode.SYS_DATABASE_ERROR,
-                {
-                    operation: 'getUserCount'
-                },
-                error as Error
-            );
-        }
-    }
 }
