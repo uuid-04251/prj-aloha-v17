@@ -15,7 +15,7 @@ dotenv.config();
 
 // Create Fastify instance with logging
 const server = fastify({
-    logger: logger,
+    logger: { instance: logger } as any,
     maxParamLength: 5000
 });
 

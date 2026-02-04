@@ -4,6 +4,7 @@ import { env } from './env';
 // Create logger instance
 export const logger = pino({
     level: env.BE_LOG_LEVEL,
+    msgPrefix: '',
     formatters: {
         level: (label) => {
             return { level: label };
