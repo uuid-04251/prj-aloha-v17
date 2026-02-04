@@ -1,5 +1,5 @@
-import { publicProcedure, protectedProcedure, adminProcedure } from '@/lib/trpc/trpc';
-import { TRPCError } from '@trpc/server';
+import { createUserError, ErrorCode } from '@/lib/errors';
+import { adminProcedure, protectedProcedure, publicProcedure } from '@/lib/trpc/trpc';
 import { sanitizeUserResponse, sanitizeUsersResponse } from './users.helpers';
 import { createUserSchema, deleteUserInputSchema, deleteUserOutputSchema, getUserByIdInputSchema, getUsersOutputSchema, getUsersSchema, updateProfileInputSchema, userResponseSchema } from './users.schemas';
 import { UserService } from './users.service';
@@ -27,9 +27,8 @@ export const deleteUser = adminProcedure
         const deleted = await UserService.deleteUser(input.userId);
 
         if (!deleted) {
-            throw new TRPCError({
-                code: 'NOT_FOUND',
-                message: 'User not found'
+            throw createUserError(ErrorCode.USER_NOT_FOUND, input.userId, {
+                operation: 'delete'
             });
         }
 
@@ -37,17 +36,27 @@ export const deleteUser = adminProcedure
     });
 /**
  * Get a single user by ID (without password)
+ * Requires authentication - users can only view their own profile or admins can view any
  */
-export const getUserById = publicProcedure
+export const getUserById = protectedProcedure
     .input(getUserByIdInputSchema)
     .output(userResponseSchema)
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+        const authUser = (ctx as any).user;
+
+        // Users can only view their own profile unless they are admin
+        if (authUser.userId !== input.userId && authUser.role !== 'admin') {
+            throw createUserError(ErrorCode.USER_ACCESS_DENIED, input.userId, {
+                requestedBy: authUser.userId,
+                operation: 'read'
+            });
+        }
+
         const user = await UserService.getUserById(input.userId);
 
         if (!user) {
-            throw new TRPCError({
-                code: 'NOT_FOUND',
-                message: 'User not found'
+            throw createUserError(ErrorCode.USER_NOT_FOUND, input.userId, {
+                operation: 'read'
             });
         }
 
@@ -78,18 +87,17 @@ export const updateProfile = protectedProcedure
 
         // Check ownership: user can only update their own profile unless admin
         if (authUser.userId !== userId && authUser.role !== 'admin') {
-            throw new TRPCError({
-                code: 'FORBIDDEN',
-                message: 'You can only update your own profile'
+            throw createUserError(ErrorCode.USER_ACCESS_DENIED, userId, {
+                requestedBy: authUser.userId,
+                operation: 'update'
             });
         }
 
         const user = await UserService.updateUser(userId, updateData);
 
         if (!user) {
-            throw new TRPCError({
-                code: 'NOT_FOUND',
-                message: 'User not found'
+            throw createUserError(ErrorCode.USER_NOT_FOUND, userId, {
+                operation: 'update'
             });
         }
 

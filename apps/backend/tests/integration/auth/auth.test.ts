@@ -14,7 +14,7 @@ describe('Auth Integration Tests', () => {
 
     describe('register', () => {
         it('should register a new user successfully', async () => {
-            const result = await authService.register('test@example.com', 'StrongPass123!', 'Test', 'User');
+            const result = await authService.register('test@example.com', 'StrongPassword123!', 'Test', 'User');
 
             expect(result.user).toMatchObject({
                 email: 'test@example.com',
@@ -27,9 +27,9 @@ describe('Auth Integration Tests', () => {
         });
 
         it('should not register duplicate email', async () => {
-            await authService.register('duplicate@example.com', 'Pass123!', 'User', 'One');
+            await authService.register('duplicate@example.com', 'Password123!', 'User', 'One');
 
-            await expect(authService.register('duplicate@example.com', 'Pass123!', 'User', 'Two')).rejects.toThrow('User with this email already exists');
+            await expect(authService.register('duplicate@example.com', 'Password123!', 'User', 'Two')).rejects.toThrow('An account with this email already exists');
         });
 
         it('should hash password on registration', async () => {
@@ -43,11 +43,11 @@ describe('Auth Integration Tests', () => {
 
     describe('login', () => {
         beforeEach(async () => {
-            await authService.register('login@example.com', 'LoginPass123!', 'Login', 'User');
+            await authService.register('login@example.com', 'LoginPassword123!', 'Login', 'User');
         });
 
         it('should login with correct credentials', async () => {
-            const result = await authService.login('login@example.com', 'LoginPass123!');
+            const result = await authService.login('login@example.com', 'LoginPassword123!');
 
             expect(result.user.email).toBe('login@example.com');
             expect(result.accessToken).toBeDefined();
@@ -67,7 +67,7 @@ describe('Auth Integration Tests', () => {
         let refreshToken: string;
 
         beforeEach(async () => {
-            const result = await authService.register('refresh@example.com', 'RefreshPass123!', 'Refresh', 'User');
+            const result = await authService.register('refresh@example.com', 'RefreshPassword123!', 'Refresh', 'User');
             refreshToken = result.refreshToken;
         });
 
@@ -89,7 +89,7 @@ describe('Auth Integration Tests', () => {
         it('should reject blacklisted refresh token', async () => {
             await authService.refreshToken(refreshToken);
 
-            await expect(authService.refreshToken(refreshToken)).rejects.toThrow('Token has been revoked');
+            await expect(authService.refreshToken(refreshToken)).rejects.toThrow('Your session has been revoked');
         });
 
         it('should reject invalid refresh token', async () => {
@@ -102,7 +102,7 @@ describe('Auth Integration Tests', () => {
         let userId: string;
 
         beforeEach(async () => {
-            const result = await authService.register('logout@example.com', 'LogoutPass123!', 'Logout', 'User');
+            const result = await authService.register('logout@example.com', 'LogoutPassword123!', 'Logout', 'User');
             accessToken = result.accessToken;
             userId = result.user.id;
         });
@@ -124,7 +124,7 @@ describe('Auth Integration Tests', () => {
 
     describe('token blacklist', () => {
         it('should expire blacklisted tokens automatically', async () => {
-            const { user, accessToken } = await authService.register('ttl@example.com', 'TtlPass123!', 'TTL', 'User');
+            const { user, accessToken } = await authService.register('ttl@example.com', 'TtlPassword123!', 'TTL', 'User');
 
             await authService.logout(user.id, accessToken);
 

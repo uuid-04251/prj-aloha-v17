@@ -6,7 +6,7 @@ describe('User Model', () => {
         it('should create a valid user with all required fields', async () => {
             const userData = {
                 email: 'valid@example.com',
-                password: 'password123',
+                password: 'Password123!7890126456',
                 firstName: 'John',
                 lastName: 'Doe',
                 role: 'user' as const
@@ -26,7 +26,7 @@ describe('User Model', () => {
 
         it('should fail validation when email is missing', async () => {
             const user = new User({
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'John',
                 lastName: 'Doe'
             });
@@ -47,7 +47,7 @@ describe('User Model', () => {
         it('should fail validation when firstName is missing', async () => {
             const user = new User({
                 email: 'test@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 lastName: 'Doe'
             });
 
@@ -57,7 +57,7 @@ describe('User Model', () => {
         it('should fail validation when lastName is missing', async () => {
             const user = new User({
                 email: 'test@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'John'
             });
 
@@ -67,7 +67,7 @@ describe('User Model', () => {
         it('should fail validation for invalid email format', async () => {
             const user = new User({
                 email: 'invalid-email',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'John',
                 lastName: 'Doe'
             });
@@ -75,10 +75,10 @@ describe('User Model', () => {
             await expect(user.save()).rejects.toThrow();
         });
 
-        it('should fail validation for password shorter than 6 characters', async () => {
+        it('should fail validation for password shorter than 12 characters', async () => {
             const user = new User({
                 email: 'test@example.com',
-                password: '12345',
+                password: 'Short1!',
                 firstName: 'John',
                 lastName: 'Doe'
             });
@@ -89,7 +89,7 @@ describe('User Model', () => {
         it('should default role to "user" when not specified', async () => {
             const user = new User({
                 email: 'default-role@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'Default',
                 lastName: 'Role'
             });
@@ -102,7 +102,7 @@ describe('User Model', () => {
         it('should accept valid role values: user and admin', async () => {
             const userWithUserRole = new User({
                 email: 'user-role@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'User',
                 lastName: 'Role',
                 role: 'user'
@@ -110,7 +110,7 @@ describe('User Model', () => {
 
             const userWithAdminRole = new User({
                 email: 'admin-role@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'Admin',
                 lastName: 'Role',
                 role: 'admin'
@@ -126,7 +126,7 @@ describe('User Model', () => {
         it('should fail validation for invalid role value', async () => {
             const user = new User({
                 email: 'invalid-role@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'Invalid',
                 lastName: 'Role',
                 role: 'superadmin' as any // Invalid role
@@ -140,7 +140,7 @@ describe('User Model', () => {
         it('should convert email to lowercase', async () => {
             const user = new User({
                 email: 'UPPERCASE@EXAMPLE.COM',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'Upper',
                 lastName: 'Case'
             });
@@ -153,7 +153,7 @@ describe('User Model', () => {
         it('should trim whitespace from email', async () => {
             const user = new User({
                 email: '  spaced@example.com  ',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'Spaced',
                 lastName: 'Email'
             });
@@ -170,7 +170,7 @@ describe('User Model', () => {
 
             const duplicateUser = new User({
                 email,
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'Duplicate',
                 lastName: 'User'
             });
@@ -183,7 +183,7 @@ describe('User Model', () => {
         it('should trim whitespace from firstName', async () => {
             const user = new User({
                 email: 'trim-first@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: '  John  ',
                 lastName: 'Doe'
             });
@@ -196,7 +196,7 @@ describe('User Model', () => {
         it('should trim whitespace from lastName', async () => {
             const user = new User({
                 email: 'trim-last@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'John',
                 lastName: '  Doe  '
             });
@@ -209,7 +209,7 @@ describe('User Model', () => {
 
     describe('Password hashing', () => {
         it('should hash password before saving', async () => {
-            const plainPassword = 'myPlainPassword123';
+            const plainPassword = 'MyPlainPassword123!';
             const user = new User({
                 email: 'hash@example.com',
                 password: plainPassword,
@@ -227,7 +227,7 @@ describe('User Model', () => {
         it('should not rehash password if not modified', async () => {
             const user = await createTestUser({
                 email: 'no-rehash@example.com',
-                password: 'password123'
+                password: 'Password123!7890126'
             });
 
             const originalHash = user.password;
@@ -242,13 +242,13 @@ describe('User Model', () => {
         it('should rehash password when modified', async () => {
             const user = await createTestUser({
                 email: 'rehash@example.com',
-                password: 'oldPassword'
+                password: 'OldPassword123!'
             });
 
             const originalHash = user.password;
 
             // Update password
-            user.password = 'newPassword123';
+            user.password = 'NewPassword123!';
             await user.save();
 
             expect(user.password).not.toBe(originalHash);
@@ -258,7 +258,7 @@ describe('User Model', () => {
 
     describe('comparePassword method', () => {
         it('should return true for correct password', async () => {
-            const password = 'correctPassword123';
+            const password = 'CorrectPassword123!';
             const user = await createTestUser({
                 email: 'compare@example.com',
                 password
@@ -272,7 +272,7 @@ describe('User Model', () => {
         it('should return false for incorrect password', async () => {
             const user = await createTestUser({
                 email: 'compare-wrong@example.com',
-                password: 'correctPassword123'
+                password: 'CorrectPassword123!'
             });
 
             const isMatch = await user.comparePassword('wrongPassword');
@@ -283,7 +283,7 @@ describe('User Model', () => {
         it('should handle empty password comparison', async () => {
             const user = await createTestUser({
                 email: 'empty-pass@example.com',
-                password: 'actualPassword'
+                password: 'ActualPassword123!'
             });
 
             const isMatch = await user.comparePassword('');
@@ -292,14 +292,14 @@ describe('User Model', () => {
         });
 
         it('should be case sensitive', async () => {
-            const password = 'CaseSensitive123';
+            const password = 'CaseSensitive123!';
             const user = await createTestUser({
                 email: 'case-sensitive@example.com',
                 password
             });
 
             const exactMatch = await user.comparePassword(password);
-            const wrongCaseMatch = await user.comparePassword('casesensitive123');
+            const wrongCaseMatch = await user.comparePassword('casesensitive123!');
 
             expect(exactMatch).toBe(true);
             expect(wrongCaseMatch).toBe(false);
@@ -310,7 +310,7 @@ describe('User Model', () => {
         it('should automatically create createdAt and updatedAt timestamps', async () => {
             const user = new User({
                 email: 'timestamps@example.com',
-                password: 'password123',
+                password: 'Password123!7890126',
                 firstName: 'Time',
                 lastName: 'Stamp'
             });

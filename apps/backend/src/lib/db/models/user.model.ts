@@ -10,7 +10,7 @@ interface IUser extends Document {
     role: 'user' | 'admin';
     createdAt: Date;
     updatedAt: Date;
-    comparePassword(candidatePassword: string): Promise<boolean>;
+    comparePassword(_candidatePassword: string): Promise<boolean>;
 }
 
 const userSchema = new Schema<IUser>(
@@ -26,7 +26,14 @@ const userSchema = new Schema<IUser>(
         password: {
             type: String,
             required: true,
-            minlength: [6, 'Password must be at least 6 characters long']
+            minlength: [12, 'Password must be at least 12 characters long'],
+            validate: {
+                validator: function (v: string) {
+                    // At least one uppercase, one lowercase, one number, one special character
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(v);
+                },
+                message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+            }
         },
         firstName: {
             type: String,

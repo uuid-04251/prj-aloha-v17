@@ -7,7 +7,7 @@ describe('UserService - CRUD Operations', () => {
         it('should create a new user successfully', async () => {
             const userData = {
                 email: 'john.doe@example.com',
-                password: 'securePassword123',
+                password: 'SecurePassword123!',
                 firstName: 'John',
                 lastName: 'Doe',
                 role: 'user' as const
@@ -28,7 +28,7 @@ describe('UserService - CRUD Operations', () => {
         it('should create user with default role "user" when role is not specified', async () => {
             const userData = {
                 email: 'jane.doe@example.com',
-                password: 'password123',
+                password: 'Password123!',
                 firstName: 'Jane',
                 lastName: 'Doe'
             };
@@ -41,7 +41,7 @@ describe('UserService - CRUD Operations', () => {
         it('should create an admin user when role is specified', async () => {
             const userData = {
                 email: 'admin@example.com',
-                password: 'adminPass123',
+                password: 'AdminPass123!',
                 firstName: 'Admin',
                 lastName: 'User',
                 role: 'admin' as const
@@ -55,20 +55,20 @@ describe('UserService - CRUD Operations', () => {
         it('should throw error when creating user with duplicate email', async () => {
             const userData = {
                 email: 'duplicate@example.com',
-                password: 'password123',
+                password: 'Password123!',
                 firstName: 'First',
                 lastName: 'User'
             };
 
             await UserService.createUser(userData);
 
-            await expect(UserService.createUser(userData)).rejects.toThrow('User with this email already exists');
+            await expect(UserService.createUser(userData)).rejects.toThrow('An account with this email already exists');
         });
 
         it('should convert email to lowercase', async () => {
             const userData = {
                 email: 'UPPERCASE@EXAMPLE.COM',
-                password: 'password123',
+                password: 'Password123!',
                 firstName: 'Upper',
                 lastName: 'Case'
             };
@@ -81,7 +81,7 @@ describe('UserService - CRUD Operations', () => {
         it('should hash the password before saving', async () => {
             const userData = {
                 email: 'hash-test@example.com',
-                password: 'plainPassword123',
+                password: 'PlainPassword123!',
                 firstName: 'Hash',
                 lastName: 'Test'
             };
@@ -275,12 +275,10 @@ describe('UserService - CRUD Operations', () => {
             expect(deletedUser).toBeNull();
         });
 
-        it('should return false when deleting non-existent user', async () => {
+        it('should throw error when deleting non-existent user', async () => {
             const fakeId = '507f1f77bcf86cd799439011';
 
-            const result = await UserService.deleteUser(fakeId);
-
-            expect(result).toBe(false);
+            await expect(UserService.deleteUser(fakeId)).rejects.toThrow('User not found');
         });
 
         it('should throw error for invalid user ID', async () => {
@@ -374,7 +372,7 @@ describe('UserService - CRUD Operations', () => {
         it('should preserve all user fields during CRUD operations', async () => {
             const userData = {
                 email: 'complete@example.com',
-                password: 'password123',
+                password: 'Password123!',
                 firstName: 'Complete',
                 lastName: 'User',
                 role: 'admin' as const
@@ -405,7 +403,7 @@ describe('UserService - CRUD Operations', () => {
         it('should properly validate password comparison after creation', async () => {
             const userData = {
                 email: 'password-test@example.com',
-                password: 'mySecretPassword',
+                password: 'MySecretPassword123!',
                 firstName: 'Password',
                 lastName: 'Test'
             };
@@ -413,7 +411,7 @@ describe('UserService - CRUD Operations', () => {
             const user = await UserService.createUser(userData);
 
             // Test password comparison method
-            const isMatch = await user.comparePassword('mySecretPassword');
+            const isMatch = await user.comparePassword('MySecretPassword123!');
             const isNotMatch = await user.comparePassword('wrongPassword');
 
             expect(isMatch).toBe(true);

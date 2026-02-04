@@ -15,7 +15,7 @@ export async function createTestUser(
 ): Promise<IUser> {
     const defaultUser = {
         email: `test-${Date.now()}@example.com`,
-        password: 'password123',
+        password: 'Password123!',
         firstName: 'Test',
         lastName: 'User',
         role: 'user' as const,
@@ -30,12 +30,14 @@ export async function createTestUser(
  */
 export async function createTestUsers(count: number): Promise<IUser[]> {
     const users: IUser[] = [];
+    const names = ['John', 'Jane', 'Bob', 'Alice', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Henry'];
 
     for (let i = 0; i < count; i++) {
         const user = await createTestUser({
             email: `test-user-${i}-${Date.now()}@example.com`,
-            firstName: `Test${i}`,
-            lastName: `User${i}`
+            firstName: names[i % names.length] || 'John',
+            lastName: `User`,
+            password: 'Password123!'
         });
         users.push(user);
     }

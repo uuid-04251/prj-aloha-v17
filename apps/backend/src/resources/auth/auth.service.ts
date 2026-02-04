@@ -1,7 +1,8 @@
-import { hashPassword, verifyPassword, generateAccessToken, generateRefreshToken, type JWTPayload } from '../../lib/auth';
-import { logger } from '../../util/logger';
-import User, { IUser } from '../../lib/db/models/user.model';
+import { generateAccessToken, generateRefreshToken, type JWTPayload } from '../../lib/auth';
 import { Token } from '../../lib/db/models/token.model';
+import User from '../../lib/db/models/user.model';
+import { createAuthError, ErrorCode } from '../../lib/errors';
+import { logger } from '../../util/logger';
 
 // User interface for auth operations - aligned with database model
 export interface AuthUser {
@@ -29,13 +30,18 @@ export class AuthService {
             // Find user by email
             const user = await User.findOne({ email: email.toLowerCase() });
             if (!user) {
-                throw new Error('Invalid credentials');
+                throw createAuthError(ErrorCode.AUTH_INVALID_CREDENTIALS, {
+                    attemptedEmail: email.toLowerCase()
+                });
             }
 
             // Verify password using model's comparePassword method
             const isValidPassword = await user.comparePassword(password);
             if (!isValidPassword) {
-                throw new Error('Invalid credentials');
+                throw createAuthError(ErrorCode.AUTH_INVALID_CREDENTIALS, {
+                    attemptedEmail: email.toLowerCase(),
+                    userId: user._id.toString()
+                });
             }
 
             // Generate tokens
@@ -87,7 +93,10 @@ export class AuthService {
             // Check if user already exists
             const existingUser = await User.findOne({ email: email.toLowerCase() });
             if (existingUser) {
-                throw new Error('User with this email already exists');
+                throw createAuthError(ErrorCode.USER_ALREADY_EXISTS, {
+                    email: email.toLowerCase(),
+                    existingUserId: existingUser._id.toString()
+                });
             }
 
             // Create new user
@@ -153,13 +162,19 @@ export class AuthService {
             });
 
             if (blacklistedToken) {
-                throw new Error('Token has been revoked');
+                throw createAuthError(ErrorCode.AUTH_TOKEN_REVOKED, {
+                    tokenType: 'refresh',
+                    tokenId: blacklistedToken._id.toString()
+                });
             }
 
             // Verify user still exists
             const user = await User.findById(payload.userId);
             if (!user) {
-                throw new Error('User not found');
+                throw createAuthError(ErrorCode.AUTH_USER_NOT_FOUND, {
+                    userId: payload.userId,
+                    tokenUserId: payload.userId
+                });
             }
 
             // Generate new tokens

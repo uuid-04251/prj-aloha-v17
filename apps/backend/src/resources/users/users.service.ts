@@ -1,33 +1,62 @@
 import User, { IUser } from '@/lib/db/models/user.model';
+import { createError, createUserError, createValidationError, ErrorCode } from '@/lib/errors';
 import { isValidObjectId } from '@/lib/helpers/validation';
-import { TRPCError } from '@trpc/server';
+import { isValidEmail, isValidName, sanitizeUserInput } from './users.helpers';
 import { ICreateUserData, IUpdateUserData } from './users.types';
 
 export class UserService {
     /**
      * Create a new user
-     * @throws {TRPCError} BAD_REQUEST if email already exists
+     * @throws {TRPCError} BAD_REQUEST if email already exists or invalid input
      * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
      */
     static async createUser(data: ICreateUserData): Promise<IUser> {
-        const existingUser = await User.findOne({ email: data.email.toLowerCase() });
-        if (existingUser) {
-            throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: 'User with this email already exists'
+        // Sanitize input data
+        const sanitizedData = sanitizeUserInput(data);
+
+        // Validate input
+        if (!isValidEmail(sanitizedData.email)) {
+            throw createValidationError('email', ErrorCode.VALIDATION_EMAIL_INVALID);
+        }
+
+        // Validate names
+        if (!sanitizedData.firstName || sanitizedData.firstName === '' || !isValidName(sanitizedData.firstName)) {
+            throw createValidationError('firstName', ErrorCode.VALIDATION_NAME_INVALID, {
+                min: 1,
+                max: 50
+            });
+        }
+
+        if (!sanitizedData.lastName || sanitizedData.lastName === '' || !isValidName(sanitizedData.lastName)) {
+            throw createValidationError('lastName', ErrorCode.VALIDATION_NAME_INVALID, {
+                min: 1,
+                max: 50
             });
         }
 
         try {
-            const user = new User(data);
+            // Use MongoDB's built-in unique constraint instead of manual check
+            // This prevents race conditions
+            const user = new User(sanitizedData);
             await user.save();
             return user;
-        } catch (error) {
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Failed to create user',
-                cause: error
-            });
+        } catch (error: any) {
+            // Handle duplicate key error (email already exists)
+            if (error.code === 11000 && error.keyPattern?.email) {
+                throw createUserError(ErrorCode.USER_ALREADY_EXISTS, undefined, {
+                    email: sanitizedData.email,
+                    operation: 'create'
+                });
+            }
+
+            throw createError(
+                ErrorCode.SYS_DATABASE_ERROR,
+                {
+                    operation: 'createUser',
+                    email: sanitizedData.email
+                },
+                error
+            );
         }
     }
 
@@ -38,20 +67,22 @@ export class UserService {
      */
     static async getUserById(id: string): Promise<IUser | null> {
         if (!isValidObjectId(id)) {
-            throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: 'Invalid user ID format'
+            throw createValidationError('id', ErrorCode.VALIDATION_INVALID_FORMAT, {
+                expected: 'MongoDB ObjectId'
             });
         }
 
         try {
             return await User.findById(id);
         } catch (error) {
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Failed to get user',
-                cause: error
-            });
+            throw createError(
+                ErrorCode.SYS_DATABASE_ERROR,
+                {
+                    operation: 'getUserById',
+                    userId: id
+                },
+                error as Error
+            );
         }
     }
 
@@ -63,83 +94,139 @@ export class UserService {
         try {
             return await User.findOne({ email: email.toLowerCase() });
         } catch (error) {
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Failed to get user by email',
-                cause: error
-            });
+            throw createError(
+                ErrorCode.SYS_DATABASE_ERROR,
+                {
+                    operation: 'getUserByEmail',
+                    email: email.toLowerCase()
+                },
+                error as Error
+            );
         }
     }
 
     /**
      * Update user information
-     * @throws {TRPCError} BAD_REQUEST if ID is invalid or email already exists
+     * @throws {TRPCError} BAD_REQUEST if ID is invalid, email already exists, or invalid input
      * @throws {TRPCError} NOT_FOUND if user doesn't exist
      * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
      */
     static async updateUser(id: string, data: IUpdateUserData): Promise<IUser | null> {
         if (!isValidObjectId(id)) {
-            throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: 'Invalid user ID format'
+            throw createValidationError('id', ErrorCode.VALIDATION_INVALID_FORMAT, {
+                expected: 'MongoDB ObjectId'
             });
         }
 
+        // Sanitize input data
+        const sanitizedData = sanitizeUserInput(data);
+
         // Filter out undefined values and remove password field for security
-        const updateData = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== undefined && key !== 'password'));
+        const updateData = Object.fromEntries(Object.entries(sanitizedData).filter(([key, value]) => value !== undefined && value !== null && value !== '' && key !== 'password'));
 
         if (Object.keys(updateData).length === 0) {
             // Nothing to update, return current user
             return this.getUserById(id);
         }
 
+        // Validate email if being updated
+        if (updateData.email && typeof updateData.email === 'string' && !isValidEmail(updateData.email)) {
+            throw createValidationError('email', ErrorCode.VALIDATION_EMAIL_INVALID);
+        }
+
+        // Validate names if being updated
+        if (updateData.firstName && typeof updateData.firstName === 'string' && !isValidName(updateData.firstName)) {
+            throw createValidationError('firstName', ErrorCode.VALIDATION_NAME_INVALID, {
+                min: 1,
+                max: 50
+            });
+        }
+
+        if (updateData.lastName && typeof updateData.lastName === 'string' && !isValidName(updateData.lastName)) {
+            throw createValidationError('lastName', ErrorCode.VALIDATION_NAME_INVALID, {
+                min: 1,
+                max: 50
+            });
+        }
+
         // Check email uniqueness if email is being updated
-        if (updateData.email) {
+        if (updateData.email && typeof updateData.email === 'string') {
             const existingUser = await User.findOne({
                 email: updateData.email.toLowerCase(),
                 _id: { $ne: id }
             });
             if (existingUser) {
-                throw new TRPCError({
-                    code: 'BAD_REQUEST',
-                    message: 'Email already in use by another user'
+                throw createUserError(ErrorCode.USER_ALREADY_EXISTS, id, {
+                    email: updateData.email,
+                    operation: 'update',
+                    conflictingUserId: existingUser._id.toString()
                 });
             }
         }
 
+        // First check if user exists
+        const existingUser = await User.findById(id);
+        if (!existingUser) {
+            throw createUserError(ErrorCode.USER_NOT_FOUND, id, {
+                operation: 'update'
+            });
+        }
+
         try {
-            const user = await User.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+            // Use findOneAndUpdate with upsert: false to prevent race conditions
+            const user = await User.findOneAndUpdate({ _id: id }, updateData, {
+                new: true,
+                runValidators: true
+                // Add atomic check for email uniqueness
+                // MongoDB will handle the atomicity
+            });
 
             if (!user) {
-                throw new TRPCError({
-                    code: 'NOT_FOUND',
-                    message: 'User not found'
+                throw createUserError(ErrorCode.USER_NOT_FOUND, id, {
+                    operation: 'update'
                 });
             }
 
             return user;
-        } catch (error) {
-            if (error instanceof TRPCError) {
-                throw error;
+        } catch (error: any) {
+            // Handle duplicate key error for email updates
+            if (error.code === 11000 && error.keyPattern?.email) {
+                throw createUserError(ErrorCode.USER_ALREADY_EXISTS, id, {
+                    email: updateData.email,
+                    operation: 'update'
+                });
             }
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Failed to update user',
-                cause: error
-            });
+
+            throw createError(
+                ErrorCode.SYS_DATABASE_ERROR,
+                {
+                    operation: 'updateUser',
+                    userId: id,
+                    updateData: Object.keys(updateData)
+                },
+                error
+            );
         }
     }
 
     /**
      * Delete user by ID
      * @throws {TRPCError} BAD_REQUEST if ID is invalid
+     * @throws {TRPCError} NOT_FOUND if user doesn't exist
      * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
      */
     static async deleteUser(id: string): Promise<boolean> {
         if (!isValidObjectId(id)) {
-            throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: 'Invalid user ID format'
+            throw createValidationError('id', ErrorCode.VALIDATION_INVALID_FORMAT, {
+                expected: 'MongoDB ObjectId'
+            });
+        }
+
+        // First check if user exists
+        const existingUser = await User.findById(id);
+        if (!existingUser) {
+            throw createUserError(ErrorCode.USER_NOT_FOUND, id, {
+                operation: 'delete'
             });
         }
 
@@ -147,11 +234,14 @@ export class UserService {
             const result = await User.findByIdAndDelete(id);
             return !!result;
         } catch (error) {
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Failed to delete user',
-                cause: error
-            });
+            throw createError(
+                ErrorCode.SYS_DATABASE_ERROR,
+                {
+                    operation: 'deleteUser',
+                    userId: id
+                },
+                error as Error
+            );
         }
     }
 
@@ -168,11 +258,14 @@ export class UserService {
                 .skip(offset)
                 .lean(false); // Return Mongoose documents for method access
         } catch (error) {
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Failed to get users',
-                cause: error
-            });
+            throw createError(
+                ErrorCode.SYS_DATABASE_ERROR,
+                {
+                    operation: 'getUsers',
+                    pagination: { limit, offset }
+                },
+                error as Error
+            );
         }
     }
 
@@ -184,11 +277,13 @@ export class UserService {
         try {
             return await User.countDocuments();
         } catch (error) {
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Failed to get user count',
-                cause: error
-            });
+            throw createError(
+                ErrorCode.SYS_DATABASE_ERROR,
+                {
+                    operation: 'getUserCount'
+                },
+                error as Error
+            );
         }
     }
 }
