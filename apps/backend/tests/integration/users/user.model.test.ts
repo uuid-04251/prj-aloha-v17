@@ -383,4 +383,35 @@ describe('User Model', () => {
             expect(userObject).toHaveProperty('updatedAt');
         });
     });
+
+    describe('comparePassword method', () => {
+        it('should return true for correct password', async () => {
+            const user = await createTestUser({
+                password: 'CorrectPassword123!'
+            });
+
+            const isMatch = await user.comparePassword('CorrectPassword123!');
+            expect(isMatch).toBe(true);
+        });
+
+        it('should return false for incorrect password', async () => {
+            const user = await createTestUser({
+                password: 'CorrectPassword123!'
+            });
+
+            const isMatch = await user.comparePassword('WrongPassword!');
+            expect(isMatch).toBe(false);
+        });
+
+        it('should handle bcrypt compare error', async () => {
+            const user = await createTestUser();
+
+            // Mock bcrypt.compare to throw error
+            const mockCompare = jest.spyOn(require('bcryptjs'), 'compare').mockRejectedValue(new Error('Bcrypt error'));
+
+            await expect(user.comparePassword('anyPassword')).rejects.toThrow('Bcrypt error');
+
+            mockCompare.mockRestore();
+        });
+    });
 });

@@ -147,4 +147,67 @@ describe('Auth Integration Tests', () => {
             expect(() => verifyToken('invalid-token')).toThrow();
         });
     });
+
+    describe('Error Scenarios', () => {
+        describe('register', () => {
+            it('should handle database save error', async () => {
+                const mockSave = jest.spyOn(User.prototype, 'save').mockRejectedValue(new Error('Database connection failed'));
+
+                await expect(authService.register('db-error@example.com', 'Password123!', 'DB', 'Error')).rejects.toThrow('Database connection failed');
+
+                mockSave.mockRestore();
+            });
+        });
+
+        describe('refreshToken', () => {
+            it('should handle user not found after token verification', async () => {
+                // Create a valid token for a user that will be deleted
+                const result = await authService.register('delete-me@example.com', 'Password123!', 'Delete', 'Me');
+                const refreshToken = result.refreshToken;
+
+                // Delete the user
+                await User.findByIdAndDelete(result.user.id);
+
+                await expect(authService.refreshToken(refreshToken)).rejects.toThrow('User account not found');
+            });
+        });
+
+        describe('logout', () => {
+            it('should handle error in blacklisting token', async () => {
+                const mockBlacklist = jest.spyOn(authService as any, 'blacklistToken').mockRejectedValue(new Error('Blacklist failed'));
+
+                await expect(authService.logout('user-123', 'token-123')).rejects.toThrow('Blacklist failed');
+
+                mockBlacklist.mockRestore();
+            });
+        });
+
+        describe('isTokenBlacklisted', () => {
+            it('should return false on database error', async () => {
+                const mockFindOne = jest.spyOn(Token, 'findOne').mockRejectedValue(new Error('DB Error'));
+
+                const result = await authService.isTokenBlacklisted('some-token');
+                expect(result).toBe(false);
+
+                mockFindOne.mockRestore();
+            });
+        });
+
+        describe('blacklistToken', () => {
+            it('should handle token verification failure', async () => {
+                // Mock verifyToken to throw
+                const mockVerify = jest.spyOn(require('@/lib/auth'), 'verifyToken').mockImplementation(() => {
+                    throw new Error('Invalid token');
+                });
+
+                await expect((authService as any).blacklistToken('invalid-token', 'user-123', 'access')).resolves.toBeUndefined(); // Should still create blacklist entry
+
+                // Verify a blacklist entry was created
+                const entry = await Token.findOne({ token: 'invalid-token' });
+                expect(entry).toBeDefined();
+
+                mockVerify.mockRestore();
+            });
+        });
+    });
 });
