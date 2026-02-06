@@ -1,4 +1,4 @@
-import { router } from '@/lib/trpc/trpc';
+import { router } from '../../lib/trpc/trpc';
 import { getUsers, getUserById, createUser, updateProfile, deleteUser } from './users.procedures';
 
 // TODO: Add JSDoc comments for router documentation
@@ -6,11 +6,11 @@ import { getUsers, getUserById, createUser, updateProfile, deleteUser } from './
 // TODO: Add OpenAPI/Swagger documentation generation
 export const usersRouter = router({
     // CRUD Operations
-    createUser,    // CREATE
-    getUsers,      // READ (all)
-    getUserById,   // READ (by ID)
+    createUser, // CREATE
+    getUsers, // READ (all)
+    getUserById, // READ (by ID)
     updateProfile, // UPDATE
-    deleteUser,    // DELETE
+    deleteUser // DELETE
 });
 
 export type UsersRouter = typeof usersRouter;

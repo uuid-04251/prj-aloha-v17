@@ -1,5 +1,5 @@
-import { createUserError, ErrorCode } from '@/lib/errors';
-import { adminProcedure, protectedProcedure, publicProcedure } from '@/lib/trpc/trpc';
+import { createUserError, ErrorCode } from '../../lib/errors';
+import { adminProcedure, protectedProcedure, publicProcedure } from '../../lib/trpc/trpc';
 import { sanitizeUserResponse, sanitizeUsersResponse } from './users.helpers';
 import { createUserSchema, deleteUserInputSchema, deleteUserOutputSchema, getUserByIdInputSchema, getUsersOutputSchema, getUsersSchema, updateProfileInputSchema, userResponseSchema } from './users.schemas';
 import { UserService } from './users.service';

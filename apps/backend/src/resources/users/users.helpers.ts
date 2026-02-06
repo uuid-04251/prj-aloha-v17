@@ -1,4 +1,4 @@
-import { IUser } from '@/lib/db/models/user.model';
+import { IUser } from '../../lib/db/models/user.model';
 import { IUserResponseData } from './users.types';
 
 /**

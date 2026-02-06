@@ -1,6 +1,6 @@
-import User, { IUser } from '@/lib/db/models/user.model';
-import { createError, createUserError, createValidationError, ErrorCode } from '@/lib/errors';
-import { isValidObjectId } from '@/lib/helpers/validation';
+import User, { IUser } from '../../lib/db/models/user.model';
+import { createError, createUserError, createValidationError, ErrorCode } from '../../lib/errors';
+import { isValidObjectId } from '../../lib/helpers/validation';
 import { isValidEmail, isValidName, sanitizeUserInput } from './users.helpers';
 import { ICreateUserData, IUpdateUserData } from './users.types';
 
