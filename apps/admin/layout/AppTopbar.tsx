@@ -1,14 +1,22 @@
 import Link from 'next/link';
 import { classNames } from 'primereact/utils';
 import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppTopbarRef } from '@/types';
 import { LayoutContext } from './context/layoutcontext';
+import { AuthService } from '../services/AuthService';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
+    const router = useRouter();
     const menubuttonRef = useRef(null);
     const topbarmenuRef = useRef(null);
     const topbarmenubuttonRef = useRef(null);
+
+    const handleLogout = () => {
+        AuthService.clearTokens();
+        router.push('/auth/login');
+    };
 
     useImperativeHandle(ref, () => ({
         menubutton: menubuttonRef.current,
@@ -46,6 +54,10 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                         <span>Settings</span>
                     </button>
                 </Link>
+                <button type="button" className="p-link layout-topbar-button" onClick={handleLogout}>
+                    <i className="pi pi-sign-out"></i>
+                    <span>Logout</span>
+                </button>
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Layout from '../../layout/layout';
+import ProtectedLayout from '../../components/ProtectedLayout';
 
 interface AppLayoutProps {
     children: React.ReactNode;
@@ -28,5 +28,5 @@ export const viewport = {
 };
 
 export default function AppLayout({ children }: AppLayoutProps) {
-    return <Layout>{children}</Layout>;
+    return <ProtectedLayout>{children}</ProtectedLayout>;
 }

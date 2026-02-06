@@ -1,8 +1,8 @@
 import { initTRPC, TRPCError } from '@trpc/server';
+import { authService } from '../../resources/auth/auth.service';
 import { logger } from '../../util/logger';
 import { extractTokenFromHeader, verifyToken, type JWTPayload } from '../auth';
 import type { Context } from './context';
-import { authService } from '../../resources/auth/auth.service';
 
 // Initialize tRPC
 const t = initTRPC.context<Context>().create({
