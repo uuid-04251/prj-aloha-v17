@@ -23,7 +23,17 @@ const server = fastify({
 async function registerPlugins() {
     // CORS
     await server.register(cors, {
-        origin: env.CORS_ORIGIN,
+        origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            if (!origin) return callback(null, true);
+
+            const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(new Error('Not allowed by CORS'), false);
+        },
         credentials: true
     });
 
