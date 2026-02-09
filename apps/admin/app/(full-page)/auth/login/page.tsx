@@ -24,9 +24,10 @@ const LoginPage = () => {
     const loginMutation = trpc.auth.login.useMutation({
         onSuccess: (data: any) => {
             console.log('Login successful:', data);
-            // Store tokens using AuthService
+            // Store tokens and user data using AuthService
             if (data.accessToken) {
                 AuthService.setTokens(data.accessToken, data.refreshToken);
+                AuthService.setUser(data.user);
             }
             setError('');
             router.push('/');

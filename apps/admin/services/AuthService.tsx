@@ -2,6 +2,7 @@
 export class AuthService {
     private static readonly TOKEN_KEY = 'auth_token';
     private static readonly REFRESH_TOKEN_KEY = 'refresh_token';
+    private static readonly USER_KEY = 'auth_user';
 
     // Get stored token
     static getToken(): string | null {
@@ -24,16 +25,53 @@ export class AuthService {
         }
     }
 
-    // Clear all tokens
+    // Store user data
+    static setUser(user: any): void {
+        if (typeof window === 'undefined') return;
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    }
+
+    // Get stored user
+    static getUser(): any | null {
+        if (typeof window === 'undefined') return null;
+        const user = localStorage.getItem(this.USER_KEY);
+        return user ? JSON.parse(user) : null;
+    }
+
+    // Clear all tokens and user data
     static clearTokens(): void {
         if (typeof window === 'undefined') return;
         localStorage.removeItem(this.TOKEN_KEY);
         localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+        localStorage.removeItem(this.USER_KEY);
     }
 
-    // Check if user is authenticated
+    // Decode JWT token (without verification)
+    static decodeToken(token: string): any | null {
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) return null;
+            const payload = parts[1];
+            const decoded = JSON.parse(atob(payload));
+            return decoded;
+        } catch {
+            return null;
+        }
+    }
+
+    // Check if token is expired
+    static isTokenExpired(token: string): boolean {
+        const decoded = this.decodeToken(token);
+        if (!decoded || !decoded.exp) return true;
+        // Add 5 second buffer
+        return Date.now() >= decoded.exp * 1000 - 5000;
+    }
+
+    // Check if user is authenticated with valid token
     static isAuthenticated(): boolean {
-        return !!this.getToken();
+        const token = this.getToken();
+        if (!token) return false;
+        return !this.isTokenExpired(token);
     }
 
     // Get auth headers for API calls

@@ -1,6 +1,7 @@
 import { httpBatchLink, loggerLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import type { AppRouter } from '../types/trpc';
+import { AuthService } from '../services/AuthService';
 
 function getBaseUrl() {
     if (typeof window !== 'undefined') {
@@ -24,7 +25,16 @@ export const trpcClient = trpc.createClient({
             enabled: (opts) => process.env.NODE_ENV === 'development' || (opts.direction === 'down' && opts.result instanceof Error)
         }),
         httpBatchLink({
-            url: `${getBaseUrl()}/trpc`
+            url: `${getBaseUrl()}/trpc`,
+            headers() {
+                // Add Authorization header if token exists
+                const token = AuthService.getToken();
+                return token
+                    ? {
+                          Authorization: `Bearer ${token}`
+                      }
+                    : {};
+            }
         })
     ]
 });

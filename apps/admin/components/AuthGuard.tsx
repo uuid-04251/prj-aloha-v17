@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '../services/AuthService';
+import { useAuthTokenRefresh } from '../hooks/useAuthTokenRefresh';
 
 interface AuthGuardProps {
     children: React.ReactNode;
@@ -14,22 +15,38 @@ export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardPro
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    useEffect(() => {
-        // Check authentication status
-        const checkAuth = () => {
-            const authStatus = AuthService.isAuthenticated();
-            setIsAuthenticated(authStatus);
-            setIsLoading(false);
+    // Enable auto token refresh
+    useAuthTokenRefresh();
 
-            if (!authStatus) {
+    useEffect(() => {
+        // Check authentication status with token validation
+        const checkAuth = () => {
+            const token = AuthService.getToken();
+
+            if (!token) {
+                setIsAuthenticated(false);
+                setIsLoading(false);
                 router.push(redirectTo);
+                return;
             }
+
+            // Validate token expiry
+            const isValidToken = !AuthService.isTokenExpired(token);
+
+            if (!isValidToken) {
+                // Token expired, clear and redirect
+                AuthService.clearTokens();
+                setIsAuthenticated(false);
+                setIsLoading(false);
+                router.push(redirectTo);
+                return;
+            }
+
+            setIsAuthenticated(true);
+            setIsLoading(false);
         };
 
-        // Small delay to allow token storage after login redirect
-        const timer = setTimeout(checkAuth, 100);
-
-        return () => clearTimeout(timer);
+        checkAuth();
     }, [router, redirectTo]);
 
     // Show loading or nothing while checking authentication
@@ -37,10 +54,8 @@ export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardPro
         return (
             <div className="flex align-items-center justify-content-center min-h-screen">
                 <div className="text-center">
-                    <div className="spinner-border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                    <div className="mt-2">Checking authentication...</div>
+                    <i className="pi pi-spin pi-spinner" style={{ fontSize: '3rem' }}></i>
+                    <div className="mt-3 text-xl">Checking authentication...</div>
                 </div>
             </div>
         );

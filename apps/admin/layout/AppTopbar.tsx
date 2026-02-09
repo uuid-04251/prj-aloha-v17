@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AppTopbarRef } from '@/types';
 import { LayoutContext } from './context/layoutcontext';
 import { AuthService } from '../services/AuthService';
+import { trpc } from '../utils/trpc';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
@@ -13,9 +14,20 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     const topbarmenuRef = useRef(null);
     const topbarmenubuttonRef = useRef(null);
 
-    const handleLogout = () => {
-        AuthService.clearTokens();
-        router.push('/auth/login');
+    const logoutMutation = trpc.auth.logout.useMutation();
+
+    const handleLogout = async () => {
+        try {
+            // Call backend logout to blacklist tokens
+            await logoutMutation.mutateAsync();
+        } catch (error) {
+            // Even if backend logout fails, still clear local tokens
+            console.error('Logout error:', error);
+        } finally {
+            // Clear local tokens and redirect
+            AuthService.clearTokens();
+            router.push('/auth/login');
+        }
     };
 
     useImperativeHandle(ref, () => ({
