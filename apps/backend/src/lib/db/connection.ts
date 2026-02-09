@@ -12,10 +12,10 @@ export async function connectToDatabase(): Promise<void> {
 
     try {
         await mongoose.connect(env.MONGODB_URI, {
-            // Modern Mongoose doesn't need these options, but keeping for compatibility
             maxPoolSize: 10,
-            serverSelectionTimeoutMS: 5000,
-            socketTimeoutMS: 45000
+            serverSelectionTimeoutMS: 30000, // Increased from 5000 to 30000ms
+            socketTimeoutMS: 45000,
+            connectTimeoutMS: 30000
         });
 
         isConnected = true;
@@ -48,15 +48,27 @@ export function getConnectionStatus(): boolean {
 // Handle connection events
 mongoose.connection.on('connected', () => {
     logger.info('Mongoose connected to MongoDB');
+    isConnected = true;
 });
 
 mongoose.connection.on('error', (err) => {
     logger.error('Mongoose connection error:', err);
+    isConnected = false;
 });
 
 mongoose.connection.on('disconnected', () => {
     logger.warn('Mongoose disconnected from MongoDB');
     isConnected = false;
+});
+
+// Auto-reconnect on disconnection
+mongoose.connection.on('disconnected', async () => {
+    logger.warn('Attempting to reconnect to MongoDB...');
+    try {
+        await connectToDatabase();
+    } catch (error) {
+        logger.error(`Auto-reconnect failed: ${(error as Error).message}`);
+    }
 });
 
 // Graceful shutdown

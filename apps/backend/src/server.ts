@@ -6,7 +6,7 @@ import { appRouter } from './lib/trpc/router';
 import { createContext } from './lib/trpc/context';
 import { logger } from './util/logger';
 import { env } from './util/env';
-import { connectToDatabase } from './lib/db/connection';
+import { connectToDatabase, getConnectionStatus } from './lib/db/connection';
 import { getRedisClient, closeRedisConnection, isRedisConnected } from './lib/redis';
 
 // Load environment variables
@@ -52,10 +52,12 @@ async function registerPlugins() {
 
 // Health check endpoint
 server.get('/health', async () => {
+    const dbStatus = getConnectionStatus() ? 'connected' : 'disconnected';
     return {
         status: 'ok',
         timestamp: new Date().toISOString(),
-        redis: isRedisConnected() ? 'connected' : 'disconnected'
+        redis: isRedisConnected() ? 'connected' : 'disconnected',
+        database: dbStatus
     };
 });
 
