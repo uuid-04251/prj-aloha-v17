@@ -10,6 +10,30 @@ const t = initTRPC.context<Context>().create({
     errorFormatter({ shape, error }) {
         logger.error(`tRPC Error: ${error.message} (code: ${error.code})`);
 
+        // Handle Zod validation errors
+        if (error.code === 'BAD_REQUEST' && error.cause) {
+            try {
+                // Try to parse Zod error
+                const zodError = JSON.parse(error.message);
+                if (Array.isArray(zodError) && zodError.length > 0) {
+                    // Extract first error message
+                    const firstError = zodError[0];
+                    return {
+                        ...shape,
+                        message: firstError.message || 'Validation failed',
+                        data: {
+                            ...shape.data,
+                            code: 'BAD_REQUEST',
+                            httpStatus: 400,
+                            zodError: zodError
+                        }
+                    };
+                }
+            } catch (parseError) {
+                // Not a JSON error, continue with normal handling
+            }
+        }
+
         return {
             ...shape,
             data: {
