@@ -12,7 +12,7 @@
 export { ErrorCode, ErrorMessages, ErrorTemplates } from './constants';
 
 // Export helper functions
-export { createError, createValidationError, createAuthError, createUserError, createSystemError, wrapError, mapToTRPCCode, isStandardizedError } from './helpers';
+export { createError, createValidationError, createAuthError, createUserError, createProductError, createSystemError, wrapError, mapToTRPCCode, isStandardizedError } from './helpers';
 
 // Export types
 export type { StandardizedError, ErrorContext, ValidationErrorDetails, AuthErrorDetails, UserErrorDetails, SystemErrorDetails, ErrorResponse, SuccessResponse, ErrorDetails, ErrorHandler, ErrorLogger, ErrorConfig } from './types';

@@ -22,6 +22,11 @@ export enum ErrorCode {
     USER_DELETE_FAILED = 'USER_DELETE_FAILED',
     USER_ACCESS_DENIED = 'USER_ACCESS_DENIED',
 
+    // Product Management (PRODUCT_xxx)
+    PRODUCT_NOT_FOUND = 'PRODUCT_NOT_FOUND',
+    PRODUCT_SKU_ALREADY_EXISTS = 'PRODUCT_SKU_ALREADY_EXISTS',
+    PRODUCT_CATEGORY_INVALID = 'PRODUCT_CATEGORY_INVALID',
+
     // Validation (VALIDATION_xxx)
     VALIDATION_REQUIRED = 'VALIDATION_REQUIRED',
     VALIDATION_INVALID_FORMAT = 'VALIDATION_INVALID_FORMAT',
@@ -57,6 +62,11 @@ export const ErrorMessages = {
     [ErrorCode.USER_UPDATE_FAILED]: 'Failed to update user information',
     [ErrorCode.USER_DELETE_FAILED]: 'Failed to delete user account',
     [ErrorCode.USER_ACCESS_DENIED]: 'You can only access your own account information',
+
+    // Product messages
+    [ErrorCode.PRODUCT_NOT_FOUND]: 'Product not found',
+    [ErrorCode.PRODUCT_SKU_ALREADY_EXISTS]: 'A product with this SKU already exists',
+    [ErrorCode.PRODUCT_CATEGORY_INVALID]: 'Invalid category selected',
 
     // Validation messages (templates with placeholders)
     [ErrorCode.VALIDATION_REQUIRED]: '{field} is required',

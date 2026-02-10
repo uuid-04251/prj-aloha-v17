@@ -24,6 +24,11 @@ export function mapToTRPCCode(errorCode: ErrorCode): TRPCError['code'] {
         [ErrorCode.USER_DELETE_FAILED]: 'INTERNAL_SERVER_ERROR',
         [ErrorCode.USER_ACCESS_DENIED]: 'FORBIDDEN',
 
+        // Product errors -> NOT_FOUND or BAD_REQUEST
+        [ErrorCode.PRODUCT_NOT_FOUND]: 'NOT_FOUND',
+        [ErrorCode.PRODUCT_SKU_ALREADY_EXISTS]: 'BAD_REQUEST',
+        [ErrorCode.PRODUCT_CATEGORY_INVALID]: 'BAD_REQUEST',
+
         // Validation errors -> BAD_REQUEST
         [ErrorCode.VALIDATION_REQUIRED]: 'BAD_REQUEST',
         [ErrorCode.VALIDATION_INVALID_FORMAT]: 'BAD_REQUEST',
@@ -124,6 +129,17 @@ export function createUserError(code: ErrorCode, userId?: string, details?: Reco
         ...details,
         userId,
         category: 'user_management'
+    });
+}
+
+/**
+ * Creates a product error with product context
+ */
+export function createProductError(code: ErrorCode, productId?: string, details?: Record<string, any>): TRPCError {
+    return createError(code, {
+        ...details,
+        productId,
+        category: 'product_management'
     });
 }
 
