@@ -49,6 +49,23 @@ export class UserService {
                 });
             }
 
+            // Handle Mongoose validation errors
+            if (error.name === 'ValidationError') {
+                const validationErrors = Object.values(error.errors).map((err: any) => err.message);
+                throw createError(
+                    ErrorCode.VALIDATION_INVALID_FORMAT,
+                    {
+                        field: 'user',
+                        details: validationErrors.join('; '),
+                        validationErrors,
+                        category: 'validation'
+                    },
+                    error,
+                    `Validation failed: ${validationErrors.join('; ')}`
+                );
+            }
+
+            // Handle other database errors
             throw createError(
                 ErrorCode.SYS_DATABASE_ERROR,
                 {
