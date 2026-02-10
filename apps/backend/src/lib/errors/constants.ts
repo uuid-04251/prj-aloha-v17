@@ -65,7 +65,7 @@ export const ErrorMessages = {
     [ErrorCode.VALIDATION_TOO_SHORT]: '{field} must be at least {min} characters',
     [ErrorCode.VALIDATION_INVALID_VALUE]: '{field} contains invalid characters',
     [ErrorCode.VALIDATION_EMAIL_INVALID]: 'Please enter a valid email address',
-    [ErrorCode.VALIDATION_PASSWORD_WEAK]: 'Password must be at least 12 characters with uppercase, lowercase, number, and special character',
+    [ErrorCode.VALIDATION_PASSWORD_WEAK]: 'Password must be at least 6 characters with uppercase, lowercase, number, and special character',
     [ErrorCode.VALIDATION_NAME_INVALID]: 'Name must be 1-50 characters and contain only letters, spaces, hyphens, and apostrophes',
 
     // System messages

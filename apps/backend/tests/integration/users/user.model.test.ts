@@ -75,10 +75,10 @@ describe('User Model', () => {
             await expect(user.save()).rejects.toThrow();
         });
 
-        it('should fail validation for password shorter than 12 characters', async () => {
+        it('should fail validation for password shorter than 6 characters', async () => {
             const user = new User({
                 email: 'test@example.com',
-                password: 'Short1!',
+                password: 'Short',
                 firstName: 'John',
                 lastName: 'Doe'
             });
