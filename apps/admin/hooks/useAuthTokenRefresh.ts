@@ -107,11 +107,15 @@ export function useAuthTokenRefresh() {
             scheduleTokenRefresh(token);
         }
 
-        // Cleanup on unmount
+        // Cleanup on unmount - clear timeout and reset flags
         return () => {
             if (refreshTimeoutRef.current) {
                 clearTimeout(refreshTimeoutRef.current);
+                refreshTimeoutRef.current = undefined;
             }
+            // Reset flags to allow re-initialization if component remounts
+            isInitializedRef.current = false;
+            isRefreshingRef.current = false;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Empty dependency array to prevent re-runs

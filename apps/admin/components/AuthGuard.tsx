@@ -48,6 +48,20 @@ export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardPro
                 return;
             }
 
+            // SECURITY: Check user role - only admins can access admin panel
+            const user = AuthService.getUser();
+            if (!user || user.role !== 'admin') {
+                console.warn('Access denied: User is not an admin');
+                AuthService.clearTokens();
+                setIsAuthenticated(false);
+                setIsLoading(false);
+                // Redirect to access denied page
+                if (typeof window !== 'undefined') {
+                    router.push('/auth/access');
+                }
+                return;
+            }
+
             setIsAuthenticated(true);
             setIsLoading(false);
         };

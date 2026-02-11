@@ -28,13 +28,21 @@ export const trpcClient = trpc.createClient({
             url: `${getBaseUrl()}/trpc`,
             headers() {
                 // Only add Authorization header on client side
+                // This function is called for EACH request, ensuring fresh token
                 if (typeof window === 'undefined') return {};
                 const token = AuthService.getToken();
-                return token
-                    ? {
-                          Authorization: `Bearer ${token}`
-                      }
-                    : {};
+                if (!token) return {};
+
+                // Validate token before sending
+                if (AuthService.isTokenExpired(token)) {
+                    // Token expired, don't send it
+                    console.warn('Token expired, refresh needed');
+                    return {};
+                }
+
+                return {
+                    Authorization: `Bearer ${token}`
+                };
             }
         })
     ]

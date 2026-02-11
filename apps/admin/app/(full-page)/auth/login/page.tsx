@@ -51,12 +51,12 @@ const LoginPage = () => {
             if (data.accessToken) {
                 AuthService.setTokens(data.accessToken, data.refreshToken);
                 AuthService.setUser(data.user);
-            }
-            setError('');
-            // Add small delay to ensure tokens are stored before redirect
-            setTimeout(() => {
+                setError('');
+                // Redirect immediately after storing tokens (localStorage is synchronous)
                 router.push('/');
-            }, 100);
+            } else {
+                setError('Invalid response from server');
+            }
         },
         onError: (error: any) => {
             console.error('Login failed:', error);
@@ -65,12 +65,22 @@ const LoginPage = () => {
     });
 
     const handleLogin = () => {
+        // Prevent double submission
+        if (loginMutation.isLoading) return;
+
         if (!email || !password) {
             setError('Please enter both email and password.');
             return;
         }
         setError('');
         loginMutation.mutate({ email, password });
+    };
+
+    // Handle Enter key press
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
     };
 
     // Show loading while checking authentication
@@ -107,12 +117,21 @@ const LoginPage = () => {
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Email
                             </label>
-                            <InputText id="email1" type="text" placeholder="Email address" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <InputText id="email1" type="text" placeholder="Email address" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} value={email} onChange={(e) => setEmail(e.target.value)} onKeyPress={handleKeyPress} />
 
                             <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
                                 Password
                             </label>
-                            <Password inputId="password1" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem"></Password>
+                            <Password
+                                inputId="password1"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Password"
+                                toggleMask
+                                className="w-full mb-5"
+                                inputClassName="w-full p-3 md:w-30rem"
+                                onKeyPress={handleKeyPress}
+                            ></Password>
 
                             {error && (
                                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">

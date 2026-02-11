@@ -34,8 +34,15 @@ export class AuthService {
     // Get stored user
     static getUser(): any | null {
         if (typeof window === 'undefined') return null;
-        const user = localStorage.getItem(this.USER_KEY);
-        return user ? JSON.parse(user) : null;
+        try {
+            const user = localStorage.getItem(this.USER_KEY);
+            return user ? JSON.parse(user) : null;
+        } catch (error) {
+            console.error('Failed to parse user data:', error);
+            // Clear corrupted data
+            localStorage.removeItem(this.USER_KEY);
+            return null;
+        }
     }
 
     // Clear all tokens and user data
@@ -49,12 +56,23 @@ export class AuthService {
     // Decode JWT token (without verification)
     static decodeToken(token: string): any | null {
         try {
+            // Validate token format
+            if (!token || typeof token !== 'string') return null;
+
             const parts = token.split('.');
-            if (parts.length !== 3) return null;
+            if (parts.length !== 3) {
+                console.warn('Invalid JWT format');
+                return null;
+            }
+
             const payload = parts[1];
+            // Validate base64 payload
+            if (!payload || payload.length === 0) return null;
+
             const decoded = JSON.parse(atob(payload));
             return decoded;
-        } catch {
+        } catch (error) {
+            console.error('Failed to decode token:', error);
             return null;
         }
     }
