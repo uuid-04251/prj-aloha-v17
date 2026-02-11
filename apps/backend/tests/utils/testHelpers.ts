@@ -1,4 +1,3 @@
-import Category, { ICategory } from '@/lib/db/models/category.model';
 import { IProduct } from '@/lib/db/models/product.model';
 import { IUser } from '@/lib/db/models/user.model';
 import { ProductService } from '@/resources/products/products.service';
@@ -49,49 +48,9 @@ export async function createTestUsers(count: number): Promise<IUser[]> {
 }
 
 /**
- * Create a test category with default or custom data
- */
-export async function createTestCategory(
-    overrides: Partial<{
-        name: string;
-        description?: string;
-        status: 'active' | 'inactive';
-    }> = {}
-): Promise<ICategory> {
-    const defaultCategory = {
-        name: `Test Category ${Date.now()}`,
-        description: 'Test category description',
-        status: 'active' as const,
-        ...overrides
-    };
-
-    const category = new Category(defaultCategory);
-    return await category.save();
-}
-
-/**
- * Create multiple test categories
- */
-export async function createTestCategories(count: number): Promise<ICategory[]> {
-    const categories: ICategory[] = [];
-    const categoryNames = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports', 'Beauty', 'Toys', 'Automotive', 'Health', 'Food'];
-
-    for (let i = 0; i < count; i++) {
-        const category = await createTestCategory({
-            name: `${categoryNames[i % categoryNames.length]} ${Date.now()}`,
-            description: `Description for ${categoryNames[i % categoryNames.length]}`
-        });
-        categories.push(category);
-    }
-
-    return categories;
-}
-
-/**
  * Create a test product with default or custom data
  */
 export async function createTestProduct(
-    categoryId?: string,
     overrides: Partial<{
         name: string;
         description: string;
@@ -101,20 +60,12 @@ export async function createTestProduct(
         status: 'active' | 'inactive' | 'out_of_stock';
     }> = {}
 ): Promise<IProduct> {
-    // Create a category if not provided
-    let category = categoryId;
-    if (!category) {
-        const testCategory = await createTestCategory();
-        category = testCategory._id.toString();
-    }
-
     const defaultProduct = {
         name: `Test Product ${Date.now()}`,
         description: 'This is a test product description with enough content to meet the minimum requirements.',
         sku: `TEST${Date.now()}`,
         mainImage: 'https://example.com/image.jpg',
         images: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'],
-        category,
         status: 'active' as const,
         ...overrides
     };
@@ -125,12 +76,12 @@ export async function createTestProduct(
 /**
  * Create multiple test products
  */
-export async function createTestProducts(count: number, categoryId?: string): Promise<IProduct[]> {
+export async function createTestProducts(count: number): Promise<IProduct[]> {
     const products: IProduct[] = [];
     const productNames = ['Laptop', 'Smartphone', 'Tablet', 'Headphones', 'Mouse', 'Keyboard', 'Monitor', 'Printer', 'Router', 'Webcam'];
 
     for (let i = 0; i < count; i++) {
-        const product = await createTestProduct(categoryId, {
+        const product = await createTestProduct({
             name: `${productNames[i % productNames.length]} ${Date.now()}`,
             sku: `TEST${Date.now()}${i}`,
             description: `Description for ${productNames[i % productNames.length]} with enough content to meet requirements.`

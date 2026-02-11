@@ -1,5 +1,4 @@
 import Product, { IProduct } from '../../lib/db/models/product.model';
-import Category from '../../lib/db/models/category.model';
 import { createError, createProductError, createValidationError, ErrorCode } from '../../lib/errors';
 import { isValidObjectId } from '../../lib/helpers/validation';
 import { isValidSKU, sanitizeProductInput } from './products.helpers';
@@ -26,21 +25,6 @@ export class ProductService {
 
         if (!sanitizedData.sku || !isValidSKU(sanitizedData.sku)) {
             throw createValidationError('sku', ErrorCode.VALIDATION_INVALID_FORMAT);
-        }
-
-        // Validate category exists
-        if (!isValidObjectId(sanitizedData.category)) {
-            throw createValidationError('category', ErrorCode.VALIDATION_INVALID_FORMAT, {
-                expected: 'MongoDB ObjectId'
-            });
-        }
-
-        const categoryExists = await Category.findById(sanitizedData.category);
-        if (!categoryExists) {
-            throw createProductError(ErrorCode.PRODUCT_CATEGORY_INVALID, undefined, {
-                categoryId: sanitizedData.category,
-                operation: 'create'
-            });
         }
 
         try {
@@ -95,15 +79,6 @@ export class ProductService {
             let query: any = {};
 
             // Apply filters
-            if (filters?.category) {
-                if (!isValidObjectId(filters.category)) {
-                    throw createValidationError('category', ErrorCode.VALIDATION_INVALID_FORMAT, {
-                        expected: 'MongoDB ObjectId'
-                    });
-                }
-                query.category = filters.category;
-            }
-
             if (filters?.status) {
                 query.status = filters.status;
             }
@@ -112,12 +87,7 @@ export class ProductService {
                 query.$text = { $search: filters.search };
             }
 
-            return await Product.find(query)
-                .populate('category', 'name') // Populate category name
-                .sort({ createdAt: -1 })
-                .limit(limit)
-                .skip(offset)
-                .lean(false); // Return Mongoose documents for method access
+            return await Product.find(query).sort({ createdAt: -1 }).limit(limit).skip(offset).lean(false); // Return Mongoose documents for method access
         } catch (error) {
             throw createError(
                 ErrorCode.SYS_DATABASE_ERROR,
@@ -144,7 +114,7 @@ export class ProductService {
         }
 
         try {
-            return await Product.findById(productId).populate('category', 'name');
+            return await Product.findById(productId);
         } catch (error) {
             throw createError(
                 ErrorCode.SYS_DATABASE_ERROR,
@@ -186,23 +156,6 @@ export class ProductService {
             throw createValidationError('sku', ErrorCode.VALIDATION_INVALID_FORMAT);
         }
 
-        // Validate category if being updated
-        if (updateData.category && typeof updateData.category === 'string') {
-            if (!isValidObjectId(updateData.category)) {
-                throw createValidationError('category', ErrorCode.VALIDATION_INVALID_FORMAT, {
-                    expected: 'MongoDB ObjectId'
-                });
-            }
-
-            const categoryExists = await Category.findById(updateData.category);
-            if (!categoryExists) {
-                throw createProductError(ErrorCode.PRODUCT_CATEGORY_INVALID, productId, {
-                    categoryId: updateData.category,
-                    operation: 'update'
-                });
-            }
-        }
-
         // Check SKU uniqueness if SKU is being updated
         if (updateData.sku && typeof updateData.sku === 'string') {
             const existingProduct = await Product.findOne({
@@ -231,7 +184,7 @@ export class ProductService {
             const product = await Product.findOneAndUpdate({ _id: productId }, updateData, {
                 new: true,
                 runValidators: true
-            }).populate('category', 'name');
+            });
 
             return product;
         } catch (error: any) {
@@ -300,7 +253,6 @@ export class ProductService {
             // Try text search first
             try {
                 return await Product.find({ $text: { $search: query } }, { score: { $meta: 'textScore' } })
-                    .populate('category', 'name')
                     .sort({ score: { $meta: 'textScore' } })
                     .limit(limit)
                     .lean(false);
@@ -310,7 +262,6 @@ export class ProductService {
                     return await Product.find({
                         $or: [{ name: { $regex: query, $options: 'i' } }, { description: { $regex: query, $options: 'i' } }]
                     })
-                        .populate('category', 'name')
                         .sort({ createdAt: -1 })
                         .limit(limit)
                         .lean(false);

@@ -1,4 +1,4 @@
-// Essential types for Aloha Admin (User, Product, Category management only)
+// Essential types for Aloha Admin (User, Product management only)
 
 // Layout types (used by PrimeReact components)
 export type LayoutType = 'list' | 'grid';
@@ -7,7 +7,6 @@ export type SortOrderType = 1 | 0 | -1;
 // Status types for our entities
 export type UserStatus = 'active' | 'inactive';
 export type ProductStatus = 'active' | 'inactive' | 'out_of_stock';
-export type CategoryStatus = 'active' | 'inactive';
 
 // Basic interfaces for our data models (defined in respective services)
 export interface BaseEntity {

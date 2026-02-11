@@ -11,10 +11,10 @@ describe('ProductService - Direct Testing', () => {
         const products = await ProductService.getProducts();
 
         // Test data structure
-        expect(products.every((p) => p.id && p.name && p.price)).toBe(true);
+        expect(products.every((p) => p.id && p.name && p.sku)).toBe(true);
 
         // Test business logic
-        expect(products.every((p) => p.price > 0)).toBe(true);
+        expect(products.every((p) => p.sku && p.sku.length > 0)).toBe(true);
     });
 });
 

@@ -9,22 +9,12 @@
   "_id": ObjectId,
   "name": String,
   "description": String,
-  "price": Number,
-  "categoryId": ObjectId,
-  "imageUrl": String,
+  "sku": String,
+  "mainImage": String,
+  "images": [String],
+  "status": String,
   "createdAt": Date,
   "updatedAt": Date
-}
-```
-
-### Categories Collection
-
-```json
-{
-  "_id": ObjectId,
-  "name": String,
-  "description": String,
-  "createdAt": Date
 }
 ```
 
@@ -43,5 +33,5 @@
 
 ## Indexes
 
-- Products: categoryId, name
+- Products: sku (unique), status, name/description (text)
 - Users: email (unique)

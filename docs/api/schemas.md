@@ -7,23 +7,14 @@
 ```typescript
 const ProductSchema = z.object({
     id: z.string(),
-    name: z.string().min(1),
-    description: z.string().optional(),
-    price: z.number().positive(),
-    categoryId: z.string(),
-    imageUrl: z.string().url().optional(),
+    name: z.string().min(3),
+    description: z.string().min(10),
+    sku: z.string().min(3).max(50),
+    mainImage: z.string().url().optional(),
+    images: z.array(z.string().url()),
+    status: z.enum(['active', 'inactive', 'out_of_stock']),
     createdAt: z.date(),
     updatedAt: z.date()
-});
-```
-
-### Category Schema
-
-```typescript
-const CategorySchema = z.object({
-    id: z.string(),
-    name: z.string().min(1),
-    description: z.string().optional()
 });
 ```
 

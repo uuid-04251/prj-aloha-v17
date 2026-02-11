@@ -25,7 +25,6 @@ export enum ErrorCode {
     // Product Management (PRODUCT_xxx)
     PRODUCT_NOT_FOUND = 'PRODUCT_NOT_FOUND',
     PRODUCT_SKU_ALREADY_EXISTS = 'PRODUCT_SKU_ALREADY_EXISTS',
-    PRODUCT_CATEGORY_INVALID = 'PRODUCT_CATEGORY_INVALID',
 
     // Validation (VALIDATION_xxx)
     VALIDATION_REQUIRED = 'VALIDATION_REQUIRED',
@@ -66,7 +65,6 @@ export const ErrorMessages = {
     // Product messages
     [ErrorCode.PRODUCT_NOT_FOUND]: 'Product not found',
     [ErrorCode.PRODUCT_SKU_ALREADY_EXISTS]: 'A product with this SKU already exists',
-    [ErrorCode.PRODUCT_CATEGORY_INVALID]: 'Invalid category selected',
 
     // Validation messages (templates with placeholders)
     [ErrorCode.VALIDATION_REQUIRED]: '{field} is required',

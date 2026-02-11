@@ -27,7 +27,6 @@ export function mapToTRPCCode(errorCode: ErrorCode): TRPCError['code'] {
         // Product errors -> NOT_FOUND or BAD_REQUEST
         [ErrorCode.PRODUCT_NOT_FOUND]: 'NOT_FOUND',
         [ErrorCode.PRODUCT_SKU_ALREADY_EXISTS]: 'BAD_REQUEST',
-        [ErrorCode.PRODUCT_CATEGORY_INVALID]: 'BAD_REQUEST',
 
         // Validation errors -> BAD_REQUEST
         [ErrorCode.VALIDATION_REQUIRED]: 'BAD_REQUEST',

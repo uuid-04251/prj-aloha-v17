@@ -8,7 +8,6 @@ export const productSchema = z.object({
     sku: z.string().min(3).max(50),
     mainImage: z.string().url().optional(),
     images: z.array(z.string().url()).default([]),
-    category: z.string(),
     status: z.enum(['active', 'inactive', 'out_of_stock']),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime()
@@ -25,7 +24,6 @@ export const createProductSchema = z.object({
         .regex(/^[A-Z0-9_-]+$/, 'SKU can only contain uppercase letters, numbers, dashes, and underscores'),
     mainImage: z.string().url('Main image must be a valid URL').optional(),
     images: z.array(z.string().url('All images must be valid URLs')).optional(),
-    category: z.string().min(1, 'Category is required'),
     status: z.enum(['active', 'inactive', 'out_of_stock']).optional().default('active')
 });
 
@@ -41,14 +39,12 @@ export const updateProductSchema = z.object({
         .optional(),
     mainImage: z.string().url('Main image must be a valid URL').optional(),
     images: z.array(z.string().url('All images must be valid URLs')).optional(),
-    category: z.string().min(1, 'Category is required').optional(),
     status: z.enum(['active', 'inactive', 'out_of_stock']).optional()
 });
 
 export const getProductsSchema = z.object({
     limit: z.number().min(1).max(100).default(10),
     offset: z.number().min(0).default(0),
-    category: z.string().optional(),
     status: z.enum(['active', 'inactive', 'out_of_stock']).optional(),
     search: z.string().optional()
 });

@@ -4,25 +4,27 @@
 
 Implement Product Catalog module with simplified database model (metadata-only), including Backend (tRPC + MongoDB) and Admin Frontend (Next.js + PrimeReact). Pricing and inventory management handled by separate services.
 
-**Estimated Time:** 4-6 hours  
-**Priority:** High  
+**Estimated Time:** 4-6 hours
+**Priority:** High
 **Dependencies:** User module (as reference template), separate pricing and inventory services
 
-**✅ STATUS: BACKEND IMPLEMENTATION COMPLETED**  
-**✅ STATUS: COMPREHENSIVE TESTING COMPLETED**  
-**✅ STATUS: ALL CRITICAL BUGS FIXED**  
-**Integration Tests: 50/51 passing (1 skipped - text search index issue in test env)**  
-**Unit Tests: 7 skipped (complex mocking - integration tests provide coverage)**  
-**Build Status: ✅ PASSING**  
+**✅ STATUS: BACKEND IMPLEMENTATION COMPLETED**
+**✅ STATUS: COMPREHENSIVE TESTING COMPLETED**
+**✅ STATUS: ALL CRITICAL BUGS FIXED**
+**✅ STATUS: CATEGORY LOGIC COMPLETELY REMOVED**
+**Integration Tests: 50/51 passing (1 skipped - text search index issue in test env)**
+**Unit Tests: 7 skipped (complex mocking - integration tests provide coverage)**
+**Build Status: ✅ PASSING**
 **All Critical Bugs: ✅ FIXED**
 
 **🔧 CRITICAL BUG FIXES APPLIED:**
 
 - ✅ **Duplicate SKU Index**: Removed redundant index definition causing performance warnings
 - ✅ **Build Compilation Errors**: Simplified unit tests to resolve TypeScript compilation failures
-- ✅ **Type Safety Issues**: Fixed category field handling in response sanitization
+- ✅ **Type Safety Issues**: Fixed response sanitization
 - ✅ **Search Error Handling**: Added fallback for text search when index unavailable
 - ✅ **Update Logic Optimization**: Streamlined product update flow
+- ✅ **Category Removal**: All category logic completely removed from codebase
 
 ---
 
@@ -43,7 +45,6 @@ Implement Product Catalog module with simplified database model (metadata-only),
 - sku: string (required, unique, uppercase)
 - mainImage?: string (optional, URL validation)
 - images: string[] (optional, array of URLs)
-- category: ObjectId (ref: 'Category', required)
 - status: enum ['active', 'inactive', 'out_of_stock'] (default: 'active')
 - createdAt: Date (auto)
 - updatedAt: Date (auto)
@@ -61,26 +62,8 @@ Implement Product Catalog module with simplified database model (metadata-only),
 **Indexes:**
 
 - [x] `{ sku: 1 }` unique
-- [x] `{ category: 1 }`
 - [x] `{ status: 1 }`
 - [x] `{ name: 'text', description: 'text' }` for search
-
----
-
-#### ✅ **File: `apps/backend/src/lib/db/models/category.model.ts`**
-
-**Created for product categorization**
-
-**Schema Fields:**
-
-```typescript
-- _id: ObjectId (auto)
-- name: string (required, unique, trim, min: 2, max: 100)
-- description?: string (optional, max: 500)
-- status: enum ['active', 'inactive'] (default: 'active')
-- createdAt: Date (auto)
-- updatedAt: Date (auto)
-```
 
 ---
 
@@ -95,7 +78,6 @@ export interface ICreateProductData {
     sku: string;
     mainImage?: string | undefined;
     images?: string[] | undefined;
-    category: string; // ObjectId as string
     status?: 'active' | 'inactive' | 'out_of_stock' | undefined;
 }
 
@@ -105,7 +87,6 @@ export interface IUpdateProductData {
     sku?: string | undefined;
     mainImage?: string | undefined;
     images?: string[] | undefined;
-    category?: string | undefined;
     status?: 'active' | 'inactive' | 'out_of_stock' | undefined;
 }
 
@@ -116,14 +97,12 @@ export interface IProductResponseData {
     sku: string;
     mainImage?: string;
     images: string[];
-    category: string; // Populated category name or ID
     status: 'active' | 'inactive' | 'out_of_stock';
     createdAt: string;
     updatedAt: string;
 }
 
 export interface IProductFilters {
-    category?: string;
     status?: 'active' | 'inactive' | 'out_of_stock';
     search?: string;
 }
@@ -151,7 +130,6 @@ export const productSchema = z.object({
     sku: z.string().min(3).max(50),
     mainImage: z.string().url().optional(),
     images: z.array(z.string().url()).default([]),
-    category: z.string(),
     status: z.enum(['active', 'inactive', 'out_of_stock']),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime()
@@ -163,7 +141,6 @@ export const createProductSchema = z.object({
     sku: z.string().min(3).max(50).toUpperCase(),
     mainImage: z.string().url().optional(),
     images: z.array(z.string().url()).optional(),
-    category: z.string(),
     status: z.enum(['active', 'inactive', 'out_of_stock']).optional().default('active')
 });
 
@@ -173,14 +150,12 @@ export const updateProductSchema = z.object({
     sku: z.string().min(3).max(50).toUpperCase().optional(),
     mainImage: z.string().url().optional(),
     images: z.array(z.string().url()).optional(),
-    category: z.string().optional(),
     status: z.enum(['active', 'inactive', 'out_of_stock']).optional()
 });
 
 export const getProductsSchema = z.object({
     limit: z.number().min(1).max(100).default(10),
     offset: z.number().min(0).default(0),
-    category: z.string().optional(),
     status: z.enum(['active', 'inactive', 'out_of_stock']).optional(),
     search: z.string().optional()
 });
@@ -238,8 +213,8 @@ export class ProductService {
 **Tasks:**
 
 - [x] Implement `createProduct()` with SKU uniqueness check
-- [x] Implement `getProducts()` with filters (category, status, search)
-- [x] Implement `getProductById()` with category population
+- [x] Implement `getProducts()` with filters (status, search)
+- [x] Implement `getProductById()`
 - [x] Implement `updateProduct()` with validation
 - [x] Implement `deleteProduct()` with soft delete option
 - [x] Implement `searchProducts()` using text index
@@ -373,8 +348,7 @@ export const appRouter = router({
 export enum ErrorCode {
     // ... existing codes
     PRODUCT_NOT_FOUND = 'PRODUCT_NOT_FOUND',
-    PRODUCT_SKU_ALREADY_EXISTS = 'PRODUCT_SKU_ALREADY_EXISTS',
-    PRODUCT_CATEGORY_INVALID = 'PRODUCT_CATEGORY_INVALID'
+    PRODUCT_SKU_ALREADY_EXISTS = 'PRODUCT_SKU_ALREADY_EXISTS'
 }
 ```
 
@@ -393,9 +367,8 @@ export enum ErrorCode {
 **Added helper functions:**
 
 ```typescript
-export const createTestCategory = async (overrides?: Partial<ICategory>): Promise<ICategory>
-export const createTestProduct = async (categoryId?: string): Promise<IProduct>
-export const createTestProducts = async (count: number, categoryId?: string): Promise<IProduct[]>
+export const createTestProduct = async (overrides?: Partial<IProduct>): Promise<IProduct>
+export const createTestProducts = async (count: number): Promise<IProduct[]>
 ```
 
 #### ✅ **File: `apps/backend/tests/integration/products/product.model.test.ts`**
@@ -404,9 +377,7 @@ export const createTestProducts = async (count: number, categoryId?: string): Pr
 
 - [x] Product model validation
 - [x] SKU uniqueness constraint
-- [x] Category reference validation
 - [x] Text search indexes
-- [x] Product population (category)
 
 #### ✅ **File: `apps/backend/tests/integration/products/products.service.test.ts`**
 
@@ -415,15 +386,12 @@ export const createTestProducts = async (count: number, categoryId?: string): Pr
 - [x] Create product with valid data
 - [x] Create product with duplicate SKU (should fail)
 - [x] Get products with pagination
-- [x] Get products with category filter
 - [x] Get products with status filter
 - [x] Get product by ID
 - [x] Update product successfully
-- [x] Update product category
 - [x] Delete product
 - [x] Error handling for invalid ObjectIds
 - [x] Error handling for non-existent products
-- [x] Error handling for invalid categories
 
 #### ✅ **File: `apps/backend/tests/unit/products/products.service.test.ts`**
 
@@ -479,8 +447,8 @@ export const createTestProducts = async (count: number, categoryId?: string): Pr
 
 **Features:**
 
-- [ ] DataTable with columns: Image, Name, SKU, Category, Status, Actions
-- [ ] Search/Filter bar (by name, category, status)
+- [ ] DataTable with columns: Image, Name, SKU, Status, Actions
+- [ ] Search/Filter bar (by name, status)
 - [ ] Create Product button (admin only)
 - [ ] Edit product dialog
 - [ ] Delete product confirmation
@@ -549,12 +517,6 @@ export const createTestProducts = async (count: number, categoryId?: string): Pr
 
 ## 🔧 PHASE 3: ADDITIONAL FEATURES (Optional - 2 hours)
 
-### Category Integration
-
-- [ ] Create Category model (if not exists)
-- [ ] Add category dropdown in product form
-- [ ] Filter products by category
-
 ### Pricing Management
 
 - [ ] **Separate Pricing Service:** Create dedicated service for price, discount, cost management
@@ -579,7 +541,7 @@ export const createTestProducts = async (count: number, categoryId?: string): Pr
 ### Advanced Filters
 
 - [ ] Price range slider
-- [ ] Multi-select category filter
+- [ ] Multi-select status filter
 - [ ] Sort by (price, name, stock, date)
 
 ---
@@ -589,13 +551,12 @@ export const createTestProducts = async (count: number, categoryId?: string): Pr
 ### Backend
 
 - [x] Product model created with metadata-only fields
-- [x] Category model created for product categorization
-- [x] All TypeScript types defined (no price/stock fields)
+- [x] All TypeScript types defined (no price/stock/category fields)
 - [x] Zod schemas with simplified validations
 - [x] Service layer with CRUD methods (no stock/price management)
 - [x] tRPC procedures (protected/admin, no updateStock)
 - [x] Router registered in main app
-- [x] Error codes added (PRODUCT_NOT_FOUND, PRODUCT_SKU_ALREADY_EXISTS, PRODUCT_CATEGORY_INVALID)
+- [x] Error codes added (PRODUCT_NOT_FOUND, PRODUCT_SKU_ALREADY_EXISTS)
 - [x] Unit tests written (>80% coverage)
 - [x] Integration tests written
 - [x] All tests passing
@@ -626,15 +587,14 @@ export const createTestProducts = async (count: number, categoryId?: string): Pr
 
 ### Key Differences from User Module:
 
-1. **Products have relationships:** Category reference (will need Category model)
-2. **Simplified model:** Only metadata fields (name, description, sku, images, category, status)
-3. **No financial data:** Price, discount, cost stored separately (different service)
-4. **No inventory data:** Stock managed by separate inventory service
+1. **Simplified model:** Only metadata fields (name, description, sku, images, status)
+2. **No financial data:** Price, discount, cost stored separately (different service)
+3. **No inventory data:** Stock managed by separate inventory service
+4. **No category data:** Categories completely removed from product model
 5. **Search functionality:** Text search on name/description
 
 ### Dependencies:
 
-- **Category Model:** Need to create or reference existing Category model
 - **Upload Service:** Already exists for avatar, can reuse for product images
 - **Pricing Service:** Separate service for price, discount, cost management
 - **Inventory Service:** Separate service for stock management

@@ -15,7 +15,6 @@ export const getProducts = protectedProcedure
     .query(async ({ input }) => {
         // Build filters object, filtering out undefined values
         const filters: IProductFilters = {};
-        if (input.category) filters.category = input.category;
         if (input.status) filters.status = input.status;
         if (input.search) filters.search = input.search;
 

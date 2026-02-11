@@ -16,7 +16,6 @@ export function sanitizeProductResponse(product: IProduct): IProductResponseData
         sku: productObj.sku,
         mainImage: productObj.mainImage,
         images: productObj.images,
-        category: typeof productObj.category === 'object' && productObj.category !== null ? (productObj.category as any)._id?.toString() || productObj.category.toString() : productObj.category.toString(),
         status: productObj.status,
         createdAt: productObj.createdAt.toISOString(),
         updatedAt: productObj.updatedAt.toISOString()

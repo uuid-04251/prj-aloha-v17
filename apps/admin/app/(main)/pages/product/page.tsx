@@ -13,11 +13,9 @@ const Button = dynamic(() => import('primereact/button').then((mod) => ({ defaul
 const Dialog = dynamic(() => import('primereact/dialog').then((mod) => ({ default: mod.Dialog })));
 const InputText = dynamic(() => import('primereact/inputtext').then((mod) => ({ default: mod.InputText })));
 const InputTextarea = dynamic(() => import('primereact/inputtextarea').then((mod) => ({ default: mod.InputTextarea })));
-const InputNumber = dynamic(() => import('primereact/inputnumber').then((mod) => ({ default: mod.InputNumber })));
 const Dropdown = dynamic(() => import('primereact/dropdown').then((mod) => ({ default: mod.Dropdown })));
 const ConfirmDialog = dynamic(() => import('primereact/confirmdialog').then((mod) => ({ default: mod.ConfirmDialog })));
 const Skeleton = dynamic(() => import('primereact/skeleton').then((mod) => ({ default: mod.Skeleton })));
-const Rating = dynamic(() => import('primereact/rating').then((mod) => ({ default: mod.Rating })));
 const Tag = dynamic(() => import('primereact/tag').then((mod) => ({ default: mod.Tag })));
 const Image = dynamic(() => import('primereact/image').then((mod) => ({ default: mod.Image })));
 
@@ -26,16 +24,10 @@ const ProductPage = () => {
         id: '',
         name: '',
         description: '',
-        price: 0,
-        cost: 0,
-        stock: 0,
         sku: '',
         mainImage: '',
         images: [],
-        category: '',
         status: 'active',
-        rating: 0,
-        reviewCount: 0,
         createdAt: '',
         updatedAt: ''
     };
@@ -162,33 +154,13 @@ const ProductPage = () => {
         setProduct(_product);
     };
 
-    const onInputNumberChange = (e: any, name: string) => {
-        const val = e.value || 0;
-        let _product = { ...product };
-        (_product as any)[name] = val;
-        setProduct(_product);
-    };
-
     const onStatusChange = (e: any) => {
         let _product = { ...product };
         _product.status = e.value;
         setProduct(_product);
     };
 
-    const onCategoryChange = (e: any) => {
-        let _product = { ...product };
-        _product.category = e.value;
-        setProduct(_product);
-    };
-
     // Template functions
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(value);
-    };
-
     const imageBodyTemplate = (rowData: Product) => {
         return (
             <div className="flex align-items-center gap-2">
@@ -207,46 +179,9 @@ const ProductPage = () => {
         );
     };
 
-    const priceBodyTemplate = (rowData: Product) => {
-        return (
-            <div className="flex flex-column">
-                <span className={classNames('font-bold', { 'text-red-500': rowData.discountPrice })}>{formatCurrency(rowData.price)}</span>
-                {rowData.discountPrice && <span className="text-sm text-green-600 font-medium">Sale: {formatCurrency(rowData.discountPrice)}</span>}
-            </div>
-        );
-    };
-
-    const stockBodyTemplate = (rowData: Product) => {
-        const severity = rowData.stock > 20 ? 'success' : rowData.stock > 0 ? 'warning' : 'danger';
-
-        return <Tag value={`${rowData.stock} units`} severity={severity} />;
-    };
-
-    const ratingBodyTemplate = (rowData: Product) => {
-        return (
-            <div className="flex align-items-center gap-2">
-                <Rating value={rowData.rating} readOnly cancel={false} />
-                <span className="text-sm text-500">({rowData.reviewCount})</span>
-            </div>
-        );
-    };
-
     const statusBodyTemplate = (rowData: Product) => {
         const severity = rowData.status === 'active' ? 'success' : rowData.status === 'inactive' ? 'danger' : 'warning';
         return <Tag value={rowData.status.replace('_', ' ').toUpperCase()} severity={severity} />;
-    };
-
-    const profitBodyTemplate = (rowData: Product) => {
-        const profit = rowData.price - rowData.cost;
-        const margin = ((profit / rowData.price) * 100).toFixed(1);
-        const severity = profit > 0 ? 'success' : 'danger';
-
-        return (
-            <div className="flex flex-column">
-                <span className={`font-medium text-${severity === 'success' ? 'green' : 'red'}-600`}>{formatCurrency(profit)}</span>
-                <small className="text-500">{margin}% margin</small>
-            </div>
-        );
     };
 
     // Skeleton templates
@@ -254,24 +189,8 @@ const ProductPage = () => {
         return <Skeleton width="85%" height="1.2rem" />;
     };
 
-    const priceSkeletonTemplate = () => {
-        return <Skeleton width="70%" height="1.5rem" className="mb-1" />;
-    };
-
-    const stockSkeletonTemplate = () => {
-        return <Skeleton width="60%" height="1.8rem" className="border-round" />;
-    };
-
-    const ratingSkeletonTemplate = () => {
-        return <Skeleton width="80%" height="1.5rem" />;
-    };
-
     const statusSkeletonTemplate = () => {
         return <Skeleton width="65%" height="1.8rem" className="border-round" />;
-    };
-
-    const profitSkeletonTemplate = () => {
-        return <Skeleton width="75%" height="1.5rem" className="mb-1" />;
     };
 
     const imageSkeletonTemplate = () => {
@@ -322,17 +241,6 @@ const ProductPage = () => {
         { label: 'Out of Stock', value: 'out_of_stock' }
     ];
 
-    const categoryOptions = [
-        { label: 'Flowers', value: 'Flowers' },
-        { label: 'Plants', value: 'Plants' },
-        { label: 'Arrangements', value: 'Arrangements' },
-        { label: 'Gifts', value: 'Gifts' },
-        { label: 'Seasonal', value: 'Seasonal' },
-        { label: 'Wedding', value: 'Wedding' },
-        { label: 'Funeral', value: 'Funeral' },
-        { label: 'Corporate', value: 'Corporate' }
-    ];
-
     return (
         <div className="grid">
             <div className="col-12">
@@ -352,13 +260,10 @@ const ProductPage = () => {
                         responsiveLayout="scroll"
                     >
                         <Column field="mainImage" header="Images" body={loading ? imageSkeletonTemplate : imageBodyTemplate} style={{ width: '15%' }} />
-                        <Column field="name" header="Product Name" sortable body={loading ? nameSkeletonTemplate : undefined} style={{ width: '20%' }} />
-                        <Column field="sku" header="SKU" sortable style={{ width: '10%' }} />
-                        <Column field="price" header="Price" body={loading ? priceSkeletonTemplate : priceBodyTemplate} sortable style={{ width: '12%' }} />
-                        <Column field="stock" header="Stock" body={loading ? stockSkeletonTemplate : stockBodyTemplate} sortable style={{ width: '10%' }} />
-                        <Column field="rating" header="Rating" body={loading ? ratingSkeletonTemplate : ratingBodyTemplate} sortable style={{ width: '15%' }} />
+                        <Column field="name" header="Product Name" sortable body={loading ? nameSkeletonTemplate : undefined} style={{ width: '25%' }} />
+                        <Column field="sku" header="SKU" sortable style={{ width: '15%' }} />
+                        <Column field="description" header="Description" style={{ width: '25%' }} />
                         <Column field="status" header="Status" body={loading ? statusSkeletonTemplate : statusBodyTemplate} sortable style={{ width: '10%' }} />
-                        <Column header="Profit" body={loading ? profitSkeletonTemplate : profitBodyTemplate} style={{ width: '12%' }} />
                         <Column
                             header="Actions"
                             body={
@@ -390,41 +295,6 @@ const ProductPage = () => {
                                     SKU
                                 </label>
                                 <InputText id="sku" value={product.sku} onChange={(e) => onInputChange(e, 'sku')} />
-                            </div>
-
-                            <div className="col-12 md:col-6">
-                                <label htmlFor="category" className="block text-900 font-medium mb-2">
-                                    Category
-                                </label>
-                                <Dropdown id="category" value={product.category} onChange={onCategoryChange} options={categoryOptions} placeholder="Select a category" />
-                            </div>
-
-                            <div className="col-12 md:col-4">
-                                <label htmlFor="price" className="block text-900 font-medium mb-2">
-                                    Price ($)
-                                </label>
-                                <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
-                            </div>
-
-                            <div className="col-12 md:col-4">
-                                <label htmlFor="discountPrice" className="block text-900 font-medium mb-2">
-                                    Discount Price ($)
-                                </label>
-                                <InputNumber id="discountPrice" value={product.discountPrice} onValueChange={(e) => onInputNumberChange(e, 'discountPrice')} mode="currency" currency="USD" locale="en-US" />
-                            </div>
-
-                            <div className="col-12 md:col-4">
-                                <label htmlFor="cost" className="block text-900 font-medium mb-2">
-                                    Cost ($)
-                                </label>
-                                <InputNumber id="cost" value={product.cost} onValueChange={(e) => onInputNumberChange(e, 'cost')} mode="currency" currency="USD" locale="en-US" />
-                            </div>
-
-                            <div className="col-12 md:col-6">
-                                <label htmlFor="stock" className="block text-900 font-medium mb-2">
-                                    Stock Quantity
-                                </label>
-                                <InputNumber id="stock" value={product.stock} onValueChange={(e) => onInputNumberChange(e, 'stock')} />
                             </div>
 
                             <div className="col-12 md:col-6">

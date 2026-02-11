@@ -6,23 +6,13 @@
 interface Product {
     _id: ObjectId;
     name: string;
-    description?: string;
-    price: number;
-    categoryId: ObjectId;
-    imageUrl?: string;
+    description: string;
+    sku: string;
+    mainImage?: string;
+    images: string[];
+    status: 'active' | 'inactive' | 'out_of_stock';
     createdAt: Date;
     updatedAt: Date;
-}
-```
-
-## Category Model
-
-```typescript
-interface Category {
-    _id: ObjectId;
-    name: string;
-    description?: string;
-    createdAt: Date;
 }
 ```
 
@@ -41,5 +31,4 @@ interface User {
 
 ## Relationships
 
-- Product belongs to Category (categoryId)
 - User has role-based access

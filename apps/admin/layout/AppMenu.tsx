@@ -15,8 +15,7 @@ const AppMenu = () => {
             label: 'Management',
             items: [
                 { label: 'Users', icon: 'pi pi-fw pi-users', to: '/pages/user' },
-                { label: 'Products', icon: 'pi pi-fw pi-box', to: '/pages/product' },
-                { label: 'Categories', icon: 'pi pi-fw pi-tags', to: '/pages/category' }
+                { label: 'Products', icon: 'pi pi-fw pi-box', to: '/pages/product' }
             ]
         },
         {

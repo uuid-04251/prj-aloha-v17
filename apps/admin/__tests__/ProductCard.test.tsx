@@ -7,7 +7,6 @@ const MockProductCard = ({ product }: { product: Product }) => {
         <div data-testid="product-card">
             <h3>{product.name}</h3>
             <p>{product.description}</p>
-            <span>${product.price}</span>
             <img src={product.mainImage} alt={product.name} />
         </div>
     );
@@ -18,16 +17,10 @@ describe('ProductCard Component', () => {
         id: '1',
         name: 'Test Product',
         description: 'Test Description',
-        price: 99.99,
-        cost: 50.0,
-        stock: 10,
         sku: 'TEST-001',
         mainImage: 'https://example.com/image.jpg',
         images: ['https://example.com/image.jpg'],
-        category: 'Test',
         status: 'active',
-        rating: 4.5,
-        reviewCount: 10,
         createdAt: '2023-01-01',
         updatedAt: '2023-01-01'
     };

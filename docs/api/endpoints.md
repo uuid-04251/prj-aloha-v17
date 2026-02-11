@@ -78,12 +78,6 @@ interface ApiResponse<T = any> {
 - `updateProduct`: Cập nhật sản phẩm
 - `deleteProduct`: Xóa sản phẩm
 
-### Categories
-
-- `getCategories`: Lấy danh mục
-- `createCategory`: Tạo danh mục
-- `updateCategory`: Cập nhật danh mục
-
 ### Users
 
 - `getUsers`: Lấy người dùng

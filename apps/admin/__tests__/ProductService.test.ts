@@ -13,7 +13,7 @@ describe('ProductService', () => {
             const firstProduct = products[0];
             expect(firstProduct).toHaveProperty('id');
             expect(firstProduct).toHaveProperty('name');
-            expect(firstProduct).toHaveProperty('price');
+            expect(firstProduct).toHaveProperty('sku');
             expect(firstProduct).toHaveProperty('mainImage');
             expect(firstProduct).toHaveProperty('status');
         });
@@ -24,7 +24,7 @@ describe('ProductService', () => {
             products.forEach((product: Product) => {
                 expect(typeof product.id).toBe('string');
                 expect(typeof product.name).toBe('string');
-                expect(typeof product.price).toBe('number');
+                expect(typeof product.sku).toBe('string');
                 expect(typeof product.mainImage).toBe('string');
                 expect(['active', 'inactive', 'out_of_stock']).toContain(product.status);
             });
@@ -36,16 +36,10 @@ describe('ProductService', () => {
             const newProductData = {
                 name: 'Test Product',
                 description: 'Test Description',
-                price: 99.99,
-                cost: 50.0,
-                stock: 10,
                 sku: 'TEST-001',
                 mainImage: 'https://example.com/image.jpg',
                 images: ['https://example.com/image.jpg'],
-                category: 'Test',
-                status: 'active' as const,
-                rating: 5.0,
-                reviewCount: 0
+                status: 'active' as const
             };
 
             const createdProduct = await ProductService.createProduct(newProductData);
@@ -53,7 +47,7 @@ describe('ProductService', () => {
             expect(createdProduct).toBeDefined();
             expect(createdProduct.id).toBeDefined();
             expect(createdProduct.name).toBe(newProductData.name);
-            expect(createdProduct.price).toBe(newProductData.price);
+            expect(createdProduct.sku).toBe(newProductData.sku);
             expect(createdProduct.createdAt).toBeDefined();
             expect(createdProduct.updatedAt).toBeDefined();
         });
@@ -69,18 +63,6 @@ describe('ProductService', () => {
                     product.images.forEach((image: string) => {
                         expect(image).toMatch(/^https?:\/\//);
                     });
-                }
-            });
-        });
-
-        it('should have reasonable price values', async () => {
-            const products = await ProductService.getProducts();
-
-            products.forEach((product: Product) => {
-                expect(product.price).toBeGreaterThan(0);
-                expect(product.price).toBeLessThan(10000); // Reasonable upper limit
-                if (product.discountPrice) {
-                    expect(product.discountPrice).toBeLessThan(product.price);
                 }
             });
         });

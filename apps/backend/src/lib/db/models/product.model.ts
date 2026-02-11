@@ -7,7 +7,6 @@ interface IProduct extends Document {
     sku: string;
     mainImage?: string;
     images: string[];
-    category: mongoose.Types.ObjectId;
     status: 'active' | 'inactive' | 'out_of_stock';
     createdAt: Date;
     updatedAt: Date;
@@ -65,11 +64,6 @@ const productSchema = new Schema<IProduct>(
                 }
             }
         ],
-        category: {
-            type: Schema.Types.ObjectId,
-            ref: 'Category',
-            required: true
-        },
         status: {
             type: String,
             enum: ['active', 'inactive', 'out_of_stock'],
@@ -82,7 +76,6 @@ const productSchema = new Schema<IProduct>(
 );
 
 // Indexes
-productSchema.index({ category: 1 });
 productSchema.index({ status: 1 });
 productSchema.index({ name: 'text', description: 'text' });
 
