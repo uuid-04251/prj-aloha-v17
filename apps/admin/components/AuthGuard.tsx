@@ -15,7 +15,7 @@ export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardPro
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // Enable auto token refresh
+    // Initialize token refresh hook (it handles its own logic internally)
     useAuthTokenRefresh();
 
     useEffect(() => {
@@ -26,7 +26,10 @@ export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardPro
             if (!token) {
                 setIsAuthenticated(false);
                 setIsLoading(false);
-                router.push(redirectTo);
+                // Only redirect if not already on the redirect page to prevent infinite loops
+                if (typeof window !== 'undefined' && window.location.pathname !== redirectTo) {
+                    router.push(redirectTo);
+                }
                 return;
             }
 
@@ -38,7 +41,10 @@ export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardPro
                 AuthService.clearTokens();
                 setIsAuthenticated(false);
                 setIsLoading(false);
-                router.push(redirectTo);
+                // Only redirect if not already on the redirect page
+                if (typeof window !== 'undefined' && window.location.pathname !== redirectTo) {
+                    router.push(redirectTo);
+                }
                 return;
             }
 
@@ -47,7 +53,7 @@ export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardPro
         };
 
         checkAuth();
-    }, [router, redirectTo]);
+    }, [redirectTo, router]); // Include all dependencies used in effect
 
     // Show loading or nothing while checking authentication
     if (isLoading) {

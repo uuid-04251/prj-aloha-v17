@@ -5,7 +5,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { classNames } from 'primereact/utils';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { LayoutContext } from '../../../../layout/context/layoutcontext';
 import { AuthService } from '../../../../services/AuthService';
 import { trpc } from '../../../../utils/trpc';
@@ -15,9 +15,32 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [checked, setChecked] = useState(false);
     const [error, setError] = useState('');
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const { layoutConfig } = useContext(LayoutContext);
+    const hasCheckedAuth = useRef(false);
 
     const router = useRouter();
+
+    // Check if user is already authenticated
+    useEffect(() => {
+        // Only run on client side and once per component mount
+        if (typeof window === 'undefined' || hasCheckedAuth.current) return;
+
+        hasCheckedAuth.current = true;
+
+        const checkAuth = async () => {
+            const token = AuthService.getToken();
+            if (token && !AuthService.isTokenExpired(token)) {
+                // User is already logged in, redirect to home
+                router.push('/');
+            } else {
+                // User not authenticated, show login form
+                setIsCheckingAuth(false);
+            }
+        };
+
+        checkAuth();
+    }, [router]);
     const containerClassName = classNames('surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
 
     // tRPC login mutation
@@ -30,7 +53,10 @@ const LoginPage = () => {
                 AuthService.setUser(data.user);
             }
             setError('');
-            router.push('/');
+            // Add small delay to ensure tokens are stored before redirect
+            setTimeout(() => {
+                router.push('/');
+            }, 100);
         },
         onError: (error: any) => {
             console.error('Login failed:', error);
@@ -46,6 +72,17 @@ const LoginPage = () => {
         setError('');
         loginMutation.mutate({ email, password });
     };
+
+    // Show loading while checking authentication
+    if (isCheckingAuth) {
+        return (
+            <div className={containerClassName}>
+                <div className="flex align-items-center justify-content-center">
+                    <i className="pi pi-spin pi-spinner" style={{ fontSize: '3rem' }}></i>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={containerClassName}>

@@ -12,9 +12,14 @@ import { useRouter } from 'next/navigation';
 export function useAuthTokenRefresh() {
     const router = useRouter();
     const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+    const isRefreshingRef = useRef(false);
+    const isInitializedRef = useRef(false);
     const refreshTokenMutation = trpc.auth.refreshToken.useMutation();
 
     const scheduleTokenRefresh = (token: string) => {
+        // Only run on client side
+        if (typeof window === 'undefined') return;
+
         // Clear any existing timeout
         if (refreshTimeoutRef.current) {
             clearTimeout(refreshTimeoutRef.current);
@@ -41,6 +46,13 @@ export function useAuthTokenRefresh() {
     };
 
     const refreshToken = async () => {
+        // Only run on client side
+        if (typeof window === 'undefined') return;
+
+        // Prevent multiple concurrent refresh attempts
+        if (isRefreshingRef.current) return;
+        isRefreshingRef.current = true;
+
         const currentRefreshToken = AuthService.getRefreshToken();
         if (!currentRefreshToken) {
             // No refresh token, logout
@@ -62,15 +74,27 @@ export function useAuthTokenRefresh() {
             console.error('Token refresh failed:', error);
             // Refresh failed, logout user
             handleLogout();
+        } finally {
+            isRefreshingRef.current = false;
         }
     };
 
     const handleLogout = () => {
         AuthService.clearTokens();
-        router.push('/auth/login');
+        // Only redirect if not already on login page to prevent infinite loops
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/auth/login')) {
+            router.push('/auth/login');
+        }
     };
 
     useEffect(() => {
+        // Only run on client side to prevent SSR issues
+        if (typeof window === 'undefined') return;
+
+        // Prevent multiple initializations
+        if (isInitializedRef.current) return;
+        isInitializedRef.current = true;
+
         const token = AuthService.getToken();
         if (!token) return;
 
@@ -90,7 +114,7 @@ export function useAuthTokenRefresh() {
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, []); // Empty dependency array to prevent re-runs
 
     return { refreshToken };
 }

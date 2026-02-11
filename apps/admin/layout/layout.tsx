@@ -18,22 +18,20 @@ const SearchParamsHandler = () => {
     const { layoutState, setLayoutState } = useContext(LayoutContext);
 
     useEffect(() => {
-        if (layoutState.staticMenuMobileActive) {
-            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, staticMenuMobileActive: false }));
+        // Reset menu states when route changes
+        const hasActiveStates = layoutState.staticMenuMobileActive || layoutState.overlayMenuActive || layoutState.staticMenuDesktopInactive || layoutState.profileSidebarVisible || layoutState.configSidebarVisible;
+
+        if (hasActiveStates) {
+            setLayoutState((prevLayoutState: LayoutState) => ({
+                ...prevLayoutState,
+                staticMenuMobileActive: false,
+                overlayMenuActive: false,
+                staticMenuDesktopInactive: false,
+                profileSidebarVisible: false,
+                configSidebarVisible: false
+            }));
         }
-        if (layoutState.overlayMenuActive) {
-            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, overlayMenuActive: false }));
-        }
-        if (layoutState.staticMenuDesktopInactive) {
-            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, staticMenuDesktopInactive: false }));
-        }
-        if (layoutState.profileSidebarVisible) {
-            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, profileSidebarVisible: false }));
-        }
-        if (layoutState.configSidebarVisible) {
-            setLayoutState((prevLayoutState: LayoutState) => ({ ...prevLayoutState, configSidebarVisible: false }));
-        }
-    }, [pathname, searchParams]);
+    }, [pathname, searchParams, setLayoutState]);
 
     return null;
 };

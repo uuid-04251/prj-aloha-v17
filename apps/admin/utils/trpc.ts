@@ -27,7 +27,8 @@ export const trpcClient = trpc.createClient({
         httpBatchLink({
             url: `${getBaseUrl()}/trpc`,
             headers() {
-                // Add Authorization header if token exists
+                // Only add Authorization header on client side
+                if (typeof window === 'undefined') return {};
                 const token = AuthService.getToken();
                 return token
                     ? {

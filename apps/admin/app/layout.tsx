@@ -11,6 +11,19 @@ interface RootLayoutProps {
     children: React.ReactNode;
 }
 
+function RootLayoutContent({ children }: RootLayoutProps) {
+    // Remove useAuthTokenRefresh from root level to prevent SSR issues
+    // It will be enabled in authenticated pages only
+
+    return (
+        <PrimeReactProvider>
+            <TRPCReactProvider>
+                <LayoutProvider>{children}</LayoutProvider>
+            </TRPCReactProvider>
+        </PrimeReactProvider>
+    );
+}
+
 export default function RootLayout({ children }: RootLayoutProps) {
     return (
         <html lang="en" suppressHydrationWarning>
@@ -18,11 +31,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <link id="theme-css" href={`/themes/lara-light-blue/theme.css`} rel="stylesheet"></link>
             </head>
             <body>
-                <PrimeReactProvider>
-                    <TRPCReactProvider>
-                        <LayoutProvider>{children}</LayoutProvider>
-                    </TRPCReactProvider>
-                </PrimeReactProvider>
+                <RootLayoutContent>{children}</RootLayoutContent>
             </body>
         </html>
     );
