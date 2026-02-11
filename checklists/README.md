@@ -6,7 +6,7 @@ Thư mục chứa tất cả các todo checklist files được đánh số theo
 
 **Thư mục:** `checklists/`  
 **Ngày tạo:** February 6, 2026  
-**Tổng số checklists:** 7
+**Tổng số checklists:** 8
 
 ---
 
@@ -72,6 +72,32 @@ Thư mục chứa tất cả các todo checklist files được đánh số theo
     - Phase 1: Backend (4-5h) - Model, Types, Schemas, Service, tRPC, Tests
     - Phase 2: Frontend (2-3h) - Service, UI, Integration
     - Phase 3: Optional Features (2h)
+
+### 008 - Product Image Upload with Supabase ⭐ 🆕
+
+- **File:** `008_PRODUCT_IMAGE_UPLOAD_SUPABASE.md`
+- **Quick Start:** `008_QUICK_START_GUIDE.md`
+- **Ngày tạo:** Februar8
+- **Hoàn thành:** 1 ✅
+- **Đang thực hiện:** 2 🔄 (007, 008)
+- **Chưa bắt đầu:** 5
+- **Thời gian ước tính:** 6-8 giờ (hoặc 3-4 giờ với quick start)
+- **Supabase URL:** https://rmbitcjsxskhwzrqogfg.supabase.co
+- **Features:**
+    - ✅ Upload ảnh lên Supabase Storage
+    - ✅ Lưu URL ảnh vào MongoDB
+    - ✅ Preview ảnh trước khi upload
+    - ✅ Support multiple images (gallery)
+    - ✅ Set main product image
+    - ✅ Validation (type, size, dimensions)
+    - ✅ Auto cleanup khi xóa product
+- **Phases:**
+    - Phase 1: Supabase Setup & Configuration (15 min)
+    - Phase 2: Backend Implementation (2h)
+    - Phase 3: Frontend Implementation (2h)
+    - Phase 4: Testing & QA (1h)
+    - Phase 5: Security & Optimization (30 min)
+    - Phase 6: Documentation & Deployment (30 min)
 
 ---
 

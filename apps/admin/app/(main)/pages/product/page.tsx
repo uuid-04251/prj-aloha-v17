@@ -5,6 +5,7 @@ import { ProductService, Product } from '../../../../services/ProductService';
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import dynamic from 'next/dynamic';
+import { ImageUpload } from '../../../../components/ImageUpload/ImageUpload';
 
 // Dynamic imports for PrimeReact components
 const DataTable = dynamic(() => import('primereact/datatable').then((mod) => ({ default: mod.DataTable })));
@@ -77,12 +78,12 @@ const ProductPage = () => {
                     life: 3000
                 });
             })
-            .catch((_error: unknown) => {
+            .catch((error: any) => {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Failed to delete product',
-                    life: 3000
+                    detail: error.message || 'Failed to delete product',
+                    life: 5000
                 });
             });
     };
@@ -111,12 +112,12 @@ const ProductPage = () => {
                             life: 3000
                         });
                     })
-                    .catch((_error: unknown) => {
+                    .catch((error: any) => {
                         toast.current?.show({
                             severity: 'error',
                             summary: 'Error',
-                            detail: 'Failed to update product',
-                            life: 3000
+                            detail: error.message || 'Failed to update product',
+                            life: 5000
                         });
                     });
             } else {
@@ -132,12 +133,12 @@ const ProductPage = () => {
                             life: 3000
                         });
                     })
-                    .catch((_error: unknown) => {
+                    .catch((error: any) => {
                         toast.current?.show({
                             severity: 'error',
                             summary: 'Error',
-                            detail: 'Failed to create product',
-                            life: 3000
+                            detail: error.message || 'Failed to create product',
+                            life: 5000
                         });
                     });
             }
@@ -147,8 +148,16 @@ const ProductPage = () => {
         }
     };
 
-    const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
-        const val = (e.target && e.target.value) || '';
+    const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string | string[], name: string) => {
+        let val: string | string[];
+
+        // Handle different input types
+        if (typeof e === 'string' || Array.isArray(e)) {
+            val = e;
+        } else {
+            val = (e.target && e.target.value) || '';
+        }
+
         let _product = { ...product };
         (_product as any)[name] = val;
         setProduct(_product);
@@ -280,7 +289,7 @@ const ProductPage = () => {
                         />
                     </DataTable>
 
-                    <Dialog visible={productDialog} style={{ width: '600px' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                    <Dialog visible={productDialog} style={{ width: '700px' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                         <div className="grid">
                             <div className="col-12">
                                 <label htmlFor="name" className="block text-900 font-medium mb-2">
@@ -313,9 +322,16 @@ const ProductPage = () => {
 
                             <div className="col-12">
                                 <label htmlFor="mainImage" className="block text-900 font-medium mb-2">
-                                    Main Image URL
+                                    Main Image (Featured)
                                 </label>
-                                <InputText id="mainImage" value={product.mainImage} onChange={(e) => onInputChange(e, 'mainImage')} placeholder="https://example.com/image.jpg" />
+                                <ImageUpload value={product.mainImage} onChange={(url) => onInputChange(url as string, 'mainImage')} multiple={false} />
+                            </div>
+
+                            <div className="col-12">
+                                <label htmlFor="images" className="block text-900 font-medium mb-2">
+                                    Additional Images (Max 10)
+                                </label>
+                                <ImageUpload value={product.images} onChange={(urls) => onInputChange(urls as string[], 'images')} multiple={true} maxFiles={10} />
                             </div>
                         </div>
                     </Dialog>

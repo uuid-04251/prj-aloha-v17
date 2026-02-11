@@ -1,6 +1,7 @@
 import fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
+import multipart from '@fastify/multipart';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import { appRouter } from './lib/trpc/router';
 import { createContext } from './lib/trpc/context';
@@ -8,6 +9,8 @@ import { logger } from './util/logger';
 import { env } from './util/env';
 import { connectToDatabase, getConnectionStatus } from './lib/db/connection';
 import { getRedisClient, closeRedisConnection, isRedisConnected } from './lib/redis';
+import authPlugin from './lib/fastify-auth';
+import productUploadRoutes from './resources/products/products.upload';
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -42,6 +45,20 @@ async function registerPlugins() {
         max: 100,
         timeWindow: '1 minute'
     });
+
+    // Multipart (file uploads)
+    await server.register(multipart, {
+        limits: {
+            fileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880'), // 5MB default
+            files: 10 // Max 10 files per request
+        }
+    });
+
+    // Auth plugin (adds authenticate decorator)
+    await server.register(authPlugin);
+
+    // Product upload routes
+    await server.register(productUploadRoutes, { prefix: '/api/products' });
 
     // tRPC
     await server.register(fastifyTRPCPlugin, {

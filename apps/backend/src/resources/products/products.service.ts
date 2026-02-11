@@ -3,6 +3,8 @@ import { createError, createProductError, createValidationError, ErrorCode } fro
 import { isValidObjectId } from '../../lib/helpers/validation';
 import { isValidSKU, sanitizeProductInput } from './products.helpers';
 import { ICreateProductData, IUpdateProductData, IProductFilters } from './products.types';
+import { storageService } from '../../lib/storage/supabase.service';
+import { logger } from '../../util/logger';
 
 export class ProductService {
     /**
@@ -210,6 +212,7 @@ export class ProductService {
 
     /**
      * Delete product by ID
+     * Also deletes associated images from Supabase Storage
      * @throws {TRPCError} BAD_REQUEST if ID is invalid
      * @throws {TRPCError} NOT_FOUND if product doesn't exist
      * @throws {TRPCError} INTERNAL_SERVER_ERROR if database operation fails
@@ -221,7 +224,7 @@ export class ProductService {
             });
         }
 
-        // First check if product exists
+        // First check if product exists and get its images
         const existingProduct = await Product.findById(productId);
         if (!existingProduct) {
             throw createProductError(ErrorCode.PRODUCT_NOT_FOUND, productId, {
@@ -229,8 +232,32 @@ export class ProductService {
             });
         }
 
+        // Collect all image URLs to delete
+        const imageUrls: string[] = [];
+        if (existingProduct.mainImage) {
+            imageUrls.push(existingProduct.mainImage);
+        }
+        if (existingProduct.images && existingProduct.images.length > 0) {
+            imageUrls.push(...existingProduct.images);
+        }
+
         try {
+            // Delete product from database first
             const result = await Product.findByIdAndDelete(productId);
+
+            // Then try to delete images from Supabase
+            // Don't fail the operation if image deletion fails
+            if (imageUrls.length > 0) {
+                try {
+                    logger.info(`Deleting ${imageUrls.length} images for product ${productId}`);
+                    await storageService.deleteImages(imageUrls);
+                    logger.info(`Successfully deleted ${imageUrls.length} images`);
+                } catch (imageError: any) {
+                    // Log error but don't fail the deletion
+                    logger.error(`Failed to delete images for product ${productId}: ${imageError.message}`, imageError);
+                }
+            }
+
             return !!result;
         } catch (error) {
             throw createError(
